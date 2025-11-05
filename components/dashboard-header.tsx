@@ -39,7 +39,7 @@ export function DashboardHeader() {
             </div>
             <div>
               <h1 className="text-xl font-bold bg-gradient-to-r from-primary to-accent bg-clip-text text-transparent">
-                Zefest Admin
+                Zefast Admin
               </h1>
               <p className="text-xs text-muted-foreground font-medium">Gérez votre plateforme</p>
             </div>

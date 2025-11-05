@@ -45,7 +45,7 @@ export default function DashboardPage() {
         <h2 className="text-4xl font-bold tracking-tight bg-gradient-to-r from-primary via-accent to-primary bg-clip-text text-transparent">
           Tableau de Bord
         </h2>
-        <p className="text-muted-foreground text-lg">Bienvenue sur le tableau de bord administrateur Zefest</p>
+        <p className="text-muted-foreground text-lg">Bienvenue sur le tableau de bord administrateur Zefast</p>
       </div>
 
       <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-4">

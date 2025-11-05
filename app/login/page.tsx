@@ -36,7 +36,7 @@ export default function LoginPage() {
               {/* <Shield className="w-10 h-10 text-white" /> */}
             </div>
             <h1 className="text-5xl font-bold mb-4 bg-gradient-to-r from-white to-white/80 bg-clip-text text-transparent">
-              Zefest Admin
+              Zefast Admin
             </h1>
             <p className="text-xl text-white/90 max-w-md">
               Plateforme d'administration sécurisée pour gérer votre écosystème financier
