@@ -11,6 +11,7 @@ export interface Settings {
   bonus_percent: string
   reward_mini_withdrawal: string
   whatsapp_phone: string | null
+  telegram: string | null
   minimum_solde: string | null
   referral_bonus: boolean
   deposit_reward: boolean
@@ -40,7 +41,7 @@ export function useUpdateSettings() {
 
   return useMutation({
     mutationFn: async (data: SettingsInput) => {
-      const res = await api.patch<Settings>("/mobcash/setting", data)
+      const res = await api.put<Settings>("/mobcash/setting", data)
       return res.data
     },
     onSuccess: () => {

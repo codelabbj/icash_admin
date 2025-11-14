@@ -19,11 +19,19 @@ export interface BonusesResponse {
   results: Bonus[]
 }
 
-export function useBonuses() {
+export interface BonusFilters {
+  page?: number
+  page_size?: number
+  search?: string
+  user?: string
+  reason_bonus?: string
+}
+
+export function useBonuses(filters: BonusFilters = {}) {
   return useQuery({
-    queryKey: ["bonuses"],
+    queryKey: ["bonuses", filters],
     queryFn: async () => {
-      const res = await api.get<BonusesResponse>("/mobcash/bonus")
+      const res = await api.get<BonusesResponse>("/mobcash/bonus", { params: filters })
       return res.data
     },
   })

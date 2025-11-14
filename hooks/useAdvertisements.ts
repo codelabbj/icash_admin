@@ -3,6 +3,7 @@
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query"
 import api from "@/lib/axios"
 import { toast } from "react-hot-toast"
+import { uploadFile } from "@/lib/upload"
 
 export interface Advertisement {
   id: number
@@ -13,16 +14,38 @@ export interface Advertisement {
 }
 
 export interface AdvertisementInput {
-  image: File | string
+  image: string // Now always a string (URL) after upload
   enable: boolean
 }
 
-export function useAdvertisements() {
+export interface AdvertisementsResponse {
+  count: number
+  next: string | null
+  previous: string | null
+  results: Advertisement[]
+}
+
+export interface AdvertisementFilters {
+  page?: number
+  page_size?: number
+  enable?: boolean
+}
+
+export function useAdvertisements(filters: AdvertisementFilters = {}) {
   return useQuery({
-    queryKey: ["advertisements"],
+    queryKey: ["advertisements", filters],
     queryFn: async () => {
-      const res = await api.get<Advertisement[]>("/mobcash/ann")
-      return res.data
+      const res = await api.get<AdvertisementsResponse | Advertisement[]>("/mobcash/ann", { params: filters })
+      // Handle both paginated and non-paginated responses
+      if (Array.isArray(res.data)) {
+        return {
+          count: res.data.length,
+          next: null,
+          previous: null,
+          results: res.data,
+        } as AdvertisementsResponse
+      }
+      return res.data as AdvertisementsResponse
     },
   })
 }
@@ -32,20 +55,10 @@ export function useCreateAdvertisement() {
 
   return useMutation({
     mutationFn: async (data: AdvertisementInput) => {
-      const formData = new FormData()
-      
-      if (data.image instanceof File) {
-        formData.append("image", data.image)
-      } else {
-        formData.append("image", data.image)
-      }
-      
-      formData.append("enable", data.enable.toString())
-
-      const res = await api.post<Advertisement>("/mobcash/ann", formData, {
-        headers: {
-          "Content-Type": "multipart/form-data",
-        },
+      // Image is already uploaded and is a URL string
+      const res = await api.post<Advertisement>("/mobcash/ann", {
+        image: data.image,
+        enable: data.enable,
       })
       return res.data
     },

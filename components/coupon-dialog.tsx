@@ -105,7 +105,7 @@ export function CouponDialog({ open, onOpenChange, coupon }: CouponDialogProps) 
                   <SelectValue placeholder="Choisir une plateforme..." />
                 </SelectTrigger>
                 <SelectContent>
-                  {platforms?.map((platform) => (
+                  {platforms?.results?.map((platform) => (
                     <SelectItem key={platform.id} value={platform.id}>
                       {platform.name}
                     </SelectItem>

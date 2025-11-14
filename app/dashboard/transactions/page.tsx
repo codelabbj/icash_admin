@@ -33,6 +33,23 @@ export default function TransactionsPage() {
     setStatusDialogOpen(true)
   }
 
+  const getStatusLabel = (status: string) => {
+    switch (status.toLowerCase()) {
+      case "accept":
+        return "Accepté"
+      case "reject":
+        return "Rejeté"
+      case "pending":
+        return "En attente"
+      case "timeout":
+        return "Expiré"
+      case "init_payment":
+        return "En traitement"
+      default:
+        return status
+    }
+  }
+
   const getStatusColor = (status: string) => {
     switch (status.toLowerCase()) {
       case "accept":
@@ -43,13 +60,42 @@ export default function TransactionsPage() {
         return "secondary" // Gray/neutral
       case "timeout":
         return "outline" // Border only
+      case "init_payment":
+        return "secondary" // Gray/neutral (processing) - could also use a blue variant if available
       default:
         return "secondary" // Default fallback
     }
   }
 
-  const getNetworkName = (networkId: number) => {
-    return networks?.find((n) => n.id === networkId)?.public_name || "Unknown"
+  const getTypeTransLabel = (type: string) => {
+    switch (type.toLowerCase()) {
+      case "deposit":
+        return "Dépôt"
+      case "withdrawal":
+        return "Retrait"
+      case "reward":
+        return "Récompense"
+      default:
+        return type
+    }
+  }
+
+  const getTypeTransColor = (type: string) => {
+    switch (type.toLowerCase()) {
+      case "deposit":
+        return "default" // Primary color
+      case "withdrawal":
+        return "secondary" // Secondary color
+      case "reward":
+        return "outline" // Outline style
+      default:
+        return "secondary"
+    }
+  }
+
+  const getNetworkName = (networkId: number | null) => {
+    if (!networkId) return "-"
+    return networks?.results?.find((n) => n.id === networkId)?.public_name || "-"
   }
 
   return (
@@ -152,7 +198,7 @@ export default function TransactionsPage() {
                 </SelectTrigger>
                 <SelectContent>
                   <SelectItem value="all">Tous les Réseaux</SelectItem>
-                  {networks?.map((network) => (
+                  {networks?.results?.map((network) => (
                     <SelectItem key={network.id} value={network.id.toString()}>
                       {network.public_name}
                     </SelectItem>
@@ -187,6 +233,8 @@ export default function TransactionsPage() {
                       <TableHead className="font-semibold text-muted-foreground h-12">Référence</TableHead>
                       <TableHead className="font-semibold text-muted-foreground">Type</TableHead>
                       <TableHead className="font-semibold text-muted-foreground">Montant</TableHead>
+                      <TableHead className="font-semibold text-muted-foreground">ID Pari</TableHead>
+                      <TableHead className="font-semibold text-muted-foreground">Application</TableHead>
                       <TableHead className="font-semibold text-muted-foreground">Téléphone</TableHead>
                       <TableHead className="font-semibold text-muted-foreground">Réseau</TableHead>
                       <TableHead className="font-semibold text-muted-foreground">Statut</TableHead>
@@ -205,18 +253,39 @@ export default function TransactionsPage() {
                           </div>
                         </TableCell>
                         <TableCell>
-                          <Badge variant={transaction.type_trans === "deposit" ? "default" : "secondary"} className="font-medium">
-                            {transaction.type_trans}
+                          <Badge variant={getTypeTransColor(transaction.type_trans)} className="font-medium">
+                            {getTypeTransLabel(transaction.type_trans)}
                           </Badge>
                         </TableCell>
                         <TableCell className="font-semibold text-foreground">{transaction.amount} FCFA</TableCell>
-                        <TableCell className="text-foreground">{transaction.phone_number}</TableCell>
-                        <TableCell className="text-foreground">{getNetworkName(transaction.network)}</TableCell>
-                        <TableCell>
-                          <Badge variant={getStatusColor(transaction.status)} className="font-medium">{transaction.status}</Badge>
+                        <TableCell className="text-foreground">
+                          {transaction.user_app_id ? (
+                            <div className="flex items-center gap-2">
+                              <Badge variant="outline" className="font-mono text-xs">{transaction.user_app_id}</Badge>
+                              <CopyButton value={transaction.user_app_id} />
+                            </div>
+                          ) : (
+                            "-"
+                          )}
+                        </TableCell>
+                        <TableCell className="text-foreground">
+                          {transaction.app_details?.name || "-"}
+                        </TableCell>
+                        <TableCell className="text-foreground">{transaction.phone_number || "-"}</TableCell>
+                        <TableCell className="text-foreground">
+                          {getNetworkName(transaction.network)}
                         </TableCell>
                         <TableCell>
-                          <Badge variant="outline" className="font-medium">{transaction.source}</Badge>
+                          <Badge variant={getStatusColor(transaction.status)} className="font-medium">
+                            {getStatusLabel(transaction.status)}
+                          </Badge>
+                        </TableCell>
+                        <TableCell>
+                          {transaction.source ? (
+                            <Badge variant="outline" className="font-medium">{transaction.source}</Badge>
+                          ) : (
+                            "-"
+                          )}
                         </TableCell>
                         <TableCell className="text-muted-foreground text-sm">{new Date(transaction.created_at).toLocaleDateString()}</TableCell>
                         <TableCell className="text-right">

@@ -11,6 +11,24 @@ export interface UserAppId {
   user: string | null
   telegram_user: number | null
   app_name: string
+  app_details: {
+    id: string
+    name: string
+    image: string
+    enable: boolean
+    deposit_tuto_link: string | null
+    withdrawal_tuto_link: string | null
+    why_withdrawal_fail: string | null
+    order: number | null
+    city: string | null
+    street: string | null
+    minimun_deposit: number
+    max_deposit: number
+    minimun_with: number
+    max_win: number
+    active_for_deposit: boolean
+    active_for_with: boolean
+  } | null
 }
 
 export type UserAppIdInput = {
@@ -18,12 +36,36 @@ export type UserAppIdInput = {
   app_name: string
 }
 
-export function useUserAppIds() {
+export interface UserAppIdsResponse {
+  count: number
+  next: string | null
+  previous: string | null
+  results: UserAppId[]
+}
+
+export interface UserAppIdsFilters {
+  page?: number
+  page_size?: number
+  search?: string
+  app_name?: string
+  telegram_user?: number
+}
+
+export function useUserAppIds(filters: UserAppIdsFilters = {}) {
   return useQuery({
-    queryKey: ["user-app-ids"],
+    queryKey: ["user-app-ids", filters],
     queryFn: async () => {
-      const res = await api.get<UserAppId[]>("/mobcash/user-app-id/")
-      return res.data
+      const res = await api.get<UserAppIdsResponse | UserAppId[]>("/mobcash/user-app-id/", { params: filters })
+      // Handle both paginated and non-paginated responses
+      if (Array.isArray(res.data)) {
+        return {
+          count: res.data.length,
+          next: null,
+          previous: null,
+          results: res.data,
+        } as UserAppIdsResponse
+      }
+      return res.data as UserAppIdsResponse
     },
   })
 }

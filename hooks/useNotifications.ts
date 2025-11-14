@@ -24,14 +24,21 @@ export interface NotificationsResponse {
 export interface SendNotificationInput {
   content: string
   title: string
-  user_id: string
+  user_id?: string
 }
 
-export function useNotifications() {
+export interface NotificationFilters {
+  page?: number
+  page_size?: number
+  search?: string
+  user?: string
+}
+
+export function useNotifications(filters: NotificationFilters = {}) {
   return useQuery({
-    queryKey: ["notifications"],
+    queryKey: ["notifications", filters],
     queryFn: async () => {
-      const res = await api.get<NotificationsResponse>("/mobcash/notification")
+      const res = await api.get<NotificationsResponse>("/mobcash/notification", { params: filters })
       return res.data
     },
   })
@@ -42,14 +49,18 @@ export function useSendNotification() {
 
   return useMutation({
     mutationFn: async (data: SendNotificationInput) => {
-      const res = await api.post(`/mobcash/notification?user_id=${data.user_id}`, {
+      const url = data.user_id 
+        ? `/mobcash/notification?user_id=${data.user_id}`
+        : `/mobcash/notification`
+      
+      const res = await api.post(url, {
         content: data.content,
         title: data.title,
       })
       return res.data
     },
     onSuccess: () => {
-      toast.success("Notification sent successfully!")
+      toast.success("Notification envoyée avec succès!")
       queryClient.invalidateQueries({ queryKey: ["notifications"] })
     },
   })

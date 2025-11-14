@@ -26,12 +26,37 @@ export interface Network {
 
 export type NetworkInput = Omit<Network, "id" | "created_at">
 
-export function useNetworks() {
+export interface NetworksResponse {
+  count: number
+  next: string | null
+  previous: string | null
+  results: Network[]
+}
+
+export interface NetworkFilters {
+  page?: number
+  page_size?: number
+  search?: string
+  enable?: boolean
+  active_for_deposit?: boolean
+  active_for_with?: boolean
+}
+
+export function useNetworks(filters: NetworkFilters = {}) {
   return useQuery({
-    queryKey: ["networks"],
+    queryKey: ["networks", filters],
     queryFn: async () => {
-      const res = await api.get<Network[]>("/mobcash/network")
-      return res.data
+      const res = await api.get<NetworksResponse | Network[]>("/mobcash/network", { params: filters })
+      // Handle both paginated and non-paginated responses
+      if (Array.isArray(res.data)) {
+        return {
+          count: res.data.length,
+          next: null,
+          previous: null,
+          results: res.data,
+        } as NetworksResponse
+      }
+      return res.data as NetworksResponse
     },
   })
 }

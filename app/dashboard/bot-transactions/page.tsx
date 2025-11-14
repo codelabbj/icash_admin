@@ -33,23 +33,69 @@ export default function BotTransactionsPage() {
     setStatusDialogOpen(true)
   }
 
-  const getStatusColor = (status: string) => {
-    switch (status) {
+  const getStatusLabel = (status: string) => {
+    switch (status.toLowerCase()) {
       case "accept":
-        return "default"
+        return "Accepté"
       case "error":
-        return "destructive"
-      case "init_payment":
-        return "secondary"
+        return "Erreur"
       case "pending":
-        return "outline"
+        return "En attente"
+      case "init_payment":
+        return "En traitement"
+      default:
+        return status
+    }
+  }
+
+  const getStatusColor = (status: string) => {
+    switch (status.toLowerCase()) {
+      case "accept":
+        return "default" // Green (success)
+      case "error":
+        return "destructive" // Red (error)
+      case "pending":
+        return "outline" // Border only
+      case "init_payment":
+        return "secondary" // Gray/neutral (processing)
+      default:
+        return "secondary" // Default fallback
+    }
+  }
+
+  const getTypeTransLabel = (type: string) => {
+    switch (type.toLowerCase()) {
+      case "deposit":
+        return "Dépôt"
+      case "withdrawal":
+        return "Retrait"
+      case "disbursements":
+        return "Décaissements"
+      case "reward":
+        return "Récompense"
+      default:
+        return type
+    }
+  }
+
+  const getTypeTransColor = (type: string) => {
+    switch (type.toLowerCase()) {
+      case "deposit":
+        return "default" // Primary color
+      case "withdrawal":
+        return "secondary" // Secondary color
+      case "disbursements":
+        return "outline" // Outline style
+      case "reward":
+        return "outline" // Outline style
       default:
         return "secondary"
     }
   }
 
-  const getNetworkName = (networkId: number) => {
-    return networks?.find((n) => n.id === networkId)?.public_name || "Unknown"
+  const getNetworkName = (networkId: number | null) => {
+    if (!networkId) return "-"
+    return networks?.results?.find((n) => n.id === networkId)?.public_name || "-"
   }
 
   return (
@@ -155,7 +201,7 @@ export default function BotTransactionsPage() {
                 </SelectTrigger>
                 <SelectContent>
                   <SelectItem value="all">Tous les Réseaux</SelectItem>
-                  {networks?.map((network) => (
+                  {networks?.results?.map((network) => (
                     <SelectItem key={network.id} value={network.id.toString()}>
                       {network.public_name}
                     </SelectItem>
@@ -181,44 +227,67 @@ export default function BotTransactionsPage() {
             <div className="space-y-4">
               <Table>
                 <TableHeader>
-                  <TableRow>
-                    <TableHead>Référence</TableHead>
-                    <TableHead>Type</TableHead>
-                    <TableHead>Montant</TableHead>
-                    <TableHead>Téléphone</TableHead>
-                    <TableHead>Réseau</TableHead>
-                    <TableHead>Statut</TableHead>
-                    <TableHead>Source</TableHead>
-                    <TableHead>Créé</TableHead>
-                    <TableHead className="text-right">Actions</TableHead>
+                  <TableRow className="bg-muted/50 hover:bg-muted/50 border-b border-border/50">
+                    <TableHead className="font-semibold text-muted-foreground h-12">Référence</TableHead>
+                    <TableHead className="font-semibold text-muted-foreground">Type</TableHead>
+                    <TableHead className="font-semibold text-muted-foreground">Montant</TableHead>
+                    <TableHead className="font-semibold text-muted-foreground">ID Pari</TableHead>
+                    <TableHead className="font-semibold text-muted-foreground">Application</TableHead>
+                    <TableHead className="font-semibold text-muted-foreground">Téléphone</TableHead>
+                    <TableHead className="font-semibold text-muted-foreground">Réseau</TableHead>
+                    <TableHead className="font-semibold text-muted-foreground">Statut</TableHead>
+                    <TableHead className="font-semibold text-muted-foreground">Source</TableHead>
+                    <TableHead className="font-semibold text-muted-foreground">Créé</TableHead>
+                    <TableHead className="text-right font-semibold text-muted-foreground">Actions</TableHead>
                   </TableRow>
                 </TableHeader>
                 <TableBody>
-                  {transactionsData.results.map((transaction) => (
-                    <TableRow key={transaction.id}>
-                      <TableCell className="font-mono text-xs">
+                  {transactionsData.results.map((transaction, index) => (
+                    <TableRow key={transaction.id} className={index % 2 === 0 ? "bg-card" : "bg-muted/20"}>
+                      <TableCell className="font-mono text-xs text-foreground">
                         <div className="flex items-center gap-2">
                           {transaction.reference}
                           <CopyButton value={transaction.reference} />
                         </div>
                       </TableCell>
                       <TableCell>
-                        <Badge variant={transaction.type_trans === "deposit" ? "default" : "secondary"}>
-                          {transaction.type_trans}
+                        <Badge variant={getTypeTransColor(transaction.type_trans)} className="font-medium">
+                          {getTypeTransLabel(transaction.type_trans)}
                         </Badge>
                       </TableCell>
-                      <TableCell className="font-semibold">{transaction.amount} FCFA</TableCell>
-                      <TableCell>{transaction.phone_number}</TableCell>
-                      <TableCell>{getNetworkName(transaction.network)}</TableCell>
-                      <TableCell>
-                        <Badge variant={getStatusColor(transaction.status)}>{transaction.status}</Badge>
+                      <TableCell className="font-semibold text-foreground">{transaction.amount} FCFA</TableCell>
+                      <TableCell className="text-foreground">
+                        {transaction.user_app_id ? (
+                          <div className="flex items-center gap-2">
+                            <Badge variant="outline" className="font-mono text-xs">{transaction.user_app_id}</Badge>
+                            <CopyButton value={transaction.user_app_id} />
+                          </div>
+                        ) : (
+                          "-"
+                        )}
+                      </TableCell>
+                      <TableCell className="text-foreground">
+                        {transaction.app_details?.name || "-"}
+                      </TableCell>
+                      <TableCell className="text-foreground">{transaction.phone_number || "-"}</TableCell>
+                      <TableCell className="text-foreground">
+                        {getNetworkName(transaction.network)}
                       </TableCell>
                       <TableCell>
-                        <Badge variant="outline">{transaction.source}</Badge>
+                        <Badge variant={getStatusColor(transaction.status)} className="font-medium">
+                          {getStatusLabel(transaction.status)}
+                        </Badge>
                       </TableCell>
-                      <TableCell>{new Date(transaction.created_at).toLocaleDateString()}</TableCell>
+                      <TableCell>
+                        {transaction.source ? (
+                          <Badge variant="outline" className="font-medium">{transaction.source}</Badge>
+                        ) : (
+                          "-"
+                        )}
+                      </TableCell>
+                      <TableCell className="text-muted-foreground text-sm">{new Date(transaction.created_at).toLocaleDateString()}</TableCell>
                       <TableCell className="text-right">
-                        <Button variant="ghost" size="sm" onClick={() => handleChangeStatus(transaction)}>
+                        <Button variant="ghost" size="sm" onClick={() => handleChangeStatus(transaction)} className="font-medium">
                           <RefreshCw className="h-4 w-4 mr-1" />
                           Changer Statut
                         </Button>

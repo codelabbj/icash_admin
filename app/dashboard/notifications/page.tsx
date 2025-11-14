@@ -1,17 +1,23 @@
 "use client"
 
 import { useState } from "react"
-import { useNotifications } from "@/hooks/useNotifications"
+import { useNotifications, type NotificationFilters } from "@/hooks/useNotifications"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
+import { Input } from "@/components/ui/input"
+import { Label } from "@/components/ui/label"
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table"
 import { Badge } from "@/components/ui/badge"
-import { Loader2, Plus } from "lucide-react"
+import { Loader2, Plus, Search } from "lucide-react"
 import { SendNotificationDialog } from "@/components/send-notification-dialog"
 import { CopyButton } from "@/components/copy-button"
 
 export default function NotificationsPage() {
-  const { data: notificationsData, isLoading } = useNotifications()
+  const [filters, setFilters] = useState<NotificationFilters>({
+    page: 1,
+    page_size: 10,
+  })
+  const { data: notificationsData, isLoading } = useNotifications(filters)
   const [dialogOpen, setDialogOpen] = useState(false)
 
   return (
@@ -29,6 +35,39 @@ export default function NotificationsPage() {
 
       <Card className="border border-border/50 shadow-sm">
         <CardHeader className="border-b border-border/50 bg-muted/30">
+          <CardTitle className="text-lg font-semibold">Filtres</CardTitle>
+          <CardDescription className="text-sm">Rechercher et filtrer les notifications</CardDescription>
+        </CardHeader>
+        <CardContent className="pt-6">
+          <div className="grid gap-4 md:grid-cols-2">
+            <div className="space-y-2">
+              <Label htmlFor="search">Rechercher</Label>
+              <div className="relative">
+                <Search className="absolute left-2.5 top-2.5 h-4 w-4 text-muted-foreground" />
+                <Input
+                  id="search"
+                  placeholder="Rechercher par titre ou contenu..."
+                  value={filters.search || ""}
+                  onChange={(e) => setFilters({ ...filters, search: e.target.value || undefined, page: 1 })}
+                  className="pl-8"
+                />
+              </div>
+            </div>
+            <div className="space-y-2">
+              <Label htmlFor="user">ID Utilisateur</Label>
+              <Input
+                id="user"
+                placeholder="Filtrer par ID utilisateur..."
+                value={filters.user || ""}
+                onChange={(e) => setFilters({ ...filters, user: e.target.value || undefined, page: 1 })}
+              />
+            </div>
+          </div>
+        </CardContent>
+      </Card>
+
+      <Card className="border border-border/50 shadow-sm">
+        <CardHeader className="border-b border-border/50 bg-muted/30">
           <div className="flex items-center justify-between">
             <div>
               <CardTitle className="text-lg font-semibold">Liste des Notifications</CardTitle>
@@ -42,46 +81,66 @@ export default function NotificationsPage() {
               <Loader2 className="h-8 w-8 animate-spin text-primary" />
             </div>
           ) : notificationsData && notificationsData.results.length > 0 ? (
-            <div className="overflow-x-auto">
-              <Table>
-                <TableHeader>
-                  <TableRow className="bg-muted/50 hover:bg-muted/50 border-b border-border/50">
-                    <TableHead className="font-semibold text-muted-foreground h-12">ID</TableHead>
-                    <TableHead className="font-semibold text-muted-foreground">Titre</TableHead>
-                    <TableHead className="font-semibold text-muted-foreground">Contenu</TableHead>
-                    <TableHead className="font-semibold text-muted-foreground">ID Utilisateur</TableHead>
-                    <TableHead className="font-semibold text-muted-foreground">Statut</TableHead>
-                    <TableHead className="font-semibold text-muted-foreground">Créé le</TableHead>
-                  </TableRow>
-                </TableHeader>
-                <TableBody>
-                  {notificationsData.results.map((notification, index) => (
-                    <TableRow key={notification.id} className={index % 2 === 0 ? "bg-card" : "bg-muted/20"}>
-                      <TableCell className="font-medium text-foreground">
-                        <div className="flex items-center gap-2">
-                          {notification.id}
-                          <CopyButton value={notification.id} />
-                        </div>
-                      </TableCell>
-                      <TableCell className="font-semibold text-foreground">{notification.title}</TableCell>
-                      <TableCell className="max-w-md truncate text-muted-foreground">{notification.content}</TableCell>
-                      <TableCell className="font-mono text-xs text-muted-foreground">
-                        <div className="flex items-center gap-2">
-                          {notification.user}
-                          <CopyButton value={notification.user} />
-                        </div>
-                      </TableCell>
-                      <TableCell>
-                        <Badge variant={notification.is_read ? "secondary" : "default"} className="font-medium">
-                          {notification.is_read ? "Lu" : "Non lu"}
-                        </Badge>
-                      </TableCell>
-                      <TableCell className="text-muted-foreground text-sm">{new Date(notification.created_at).toLocaleDateString()}</TableCell>
+            <>
+              <div className="overflow-x-auto">
+                <Table>
+                  <TableHeader>
+                    <TableRow className="bg-muted/50 hover:bg-muted/50 border-b border-border/50">
+                      <TableHead className="font-semibold text-muted-foreground h-12">ID</TableHead>
+                      <TableHead className="font-semibold text-muted-foreground">Titre</TableHead>
+                      <TableHead className="font-semibold text-muted-foreground">Contenu</TableHead>
+                      {/* <TableHead className="font-semibold text-muted-foreground">Statut</TableHead> */}
+                      <TableHead className="font-semibold text-muted-foreground">Créé le</TableHead>
                     </TableRow>
-                  ))}
-                </TableBody>
-              </Table>
-            </div>
+                  </TableHeader>
+                  <TableBody>
+                    {notificationsData.results.map((notification, index) => (
+                      <TableRow key={notification.id} className={index % 2 === 0 ? "bg-card" : "bg-muted/20"}>
+                        <TableCell className="font-medium text-foreground">
+                          <div className="flex items-center gap-2">
+                            {notification.id}
+                            <CopyButton value={notification.id} />
+                          </div>
+                        </TableCell>
+                        <TableCell className="font-semibold text-foreground">{notification.title}</TableCell>
+                        <TableCell className="text-muted-foreground whitespace-normal break-words">{notification.content}</TableCell>
+                        {/* <TableCell>
+                          <Badge variant={notification.is_read ? "secondary" : "default"} className="font-medium">
+                            {notification.is_read ? "Lu" : "Non lu"}
+                          </Badge>
+                        </TableCell> */}
+                        <TableCell className="text-muted-foreground text-sm">{new Date(notification.created_at).toLocaleDateString()}</TableCell>
+                      </TableRow>
+                    ))}
+                  </TableBody>
+                </Table>
+              </div>
+              {notificationsData && (notificationsData.next || notificationsData.previous) && (
+                <div className="flex items-center justify-between px-6 py-4 border-t border-border/50">
+                  <div className="text-sm text-muted-foreground">
+                    Page {filters.page || 1} sur {Math.ceil((notificationsData.count || 0) / (filters.page_size || 10))}
+                  </div>
+                  <div className="flex gap-2">
+                    <Button
+                      variant="outline"
+                      size="sm"
+                      onClick={() => setFilters({ ...filters, page: (filters.page || 1) - 1 })}
+                      disabled={!notificationsData.previous}
+                    >
+                      Précédent
+                    </Button>
+                    <Button
+                      variant="outline"
+                      size="sm"
+                      onClick={() => setFilters({ ...filters, page: (filters.page || 1) + 1 })}
+                      disabled={!notificationsData.next}
+                    >
+                      Suivant
+                    </Button>
+                  </div>
+                </div>
+              )}
+            </>
           ) : (
             <div className="text-center py-12 text-muted-foreground">Aucune notification trouvée</div>
           )}

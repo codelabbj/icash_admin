@@ -1,18 +1,30 @@
 "use client"
 
+import { useState } from "react"
 import { useSettings } from "@/hooks/useSettings"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
 import { Badge } from "@/components/ui/badge"
-import { Loader2 } from "lucide-react"
+import { Button } from "@/components/ui/button"
+import { Loader2, Pencil } from "lucide-react"
+import { SettingsDialog } from "@/components/settings-dialog"
 
 export default function SettingsPage() {
   const { data: settings, isLoading } = useSettings()
+  const [dialogOpen, setDialogOpen] = useState(false)
 
   return (
     <div className="space-y-6">
-      <div>
-        <h2 className="text-3xl font-bold tracking-tight bg-gradient-to-r from-primary to-accent bg-clip-text text-transparent">Paramètres</h2>
-        <p className="text-muted-foreground">Consultez les paramètres de configuration de la plateforme</p>
+      <div className="flex items-center justify-between">
+        <div>
+          <h2 className="text-3xl font-bold tracking-tight bg-gradient-to-r from-primary to-accent bg-clip-text text-transparent">Paramètres</h2>
+          <p className="text-muted-foreground">Consultez les paramètres de configuration de la plateforme</p>
+        </div>
+        {settings && (
+          <Button onClick={() => setDialogOpen(true)}>
+            <Pencil className="mr-2 h-4 w-4" />
+            Modifier les Paramètres
+          </Button>
+        )}
       </div>
 
       {isLoading ? (
@@ -118,6 +130,10 @@ export default function SettingsPage() {
                 <Badge variant="outline">{settings.whatsapp_phone || "N/A"}</Badge>
               </div>
               <div className="flex justify-between items-center">
+                <span className="text-sm text-muted-foreground">Telegram</span>
+                <Badge variant="outline">{settings.telegram || "N/A"}</Badge>
+              </div>
+              <div className="flex justify-between items-center">
                 <span className="text-sm text-muted-foreground">Lien Wave</span>
                 {settings.wave_default_link ? (
                   <a
@@ -168,6 +184,8 @@ export default function SettingsPage() {
       ) : (
         <div className="text-center py-8 text-muted-foreground">Aucun paramètre trouvé</div>
       )}
+
+      <SettingsDialog open={dialogOpen} onOpenChange={setDialogOpen} />
     </div>
   )
 }

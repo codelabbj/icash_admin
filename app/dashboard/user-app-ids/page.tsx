@@ -1,12 +1,16 @@
 "use client"
 
 import { useState } from "react"
-import { useUserAppIds, useDeleteUserAppId, type UserAppId } from "@/hooks/useUserAppIds"
+import { useUserAppIds, useDeleteUserAppId, type UserAppId, type UserAppIdsFilters } from "@/hooks/useUserAppIds"
+import { usePlatforms } from "@/hooks/usePlatforms"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
+import { Input } from "@/components/ui/input"
+import { Label } from "@/components/ui/label"
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table"
 import { Badge } from "@/components/ui/badge"
-import { Loader2, Plus, Pencil, Trash2 } from "lucide-react"
+import { Loader2, Plus, Pencil, Trash2, Search } from "lucide-react"
 import { UserAppIdDialog } from "@/components/user-app-id-dialog"
 import { CopyButton } from "@/components/copy-button"
 import {
@@ -21,8 +25,15 @@ import {
 } from "@/components/ui/alert-dialog"
 
 export default function UserAppIdsPage() {
-  const { data: userAppIds, isLoading } = useUserAppIds()
+  const [filters, setFilters] = useState<UserAppIdsFilters>({
+    page: 1,
+    page_size: 10,
+  })
+  const { data: userAppIdsData, isLoading } = useUserAppIds(filters)
+  const { data: platforms } = usePlatforms()
   const deleteUserAppId = useDeleteUserAppId()
+  
+  const userAppIds = userAppIdsData?.results || []
 
   const [dialogOpen, setDialogOpen] = useState(false)
   const [selectedUserAppId, setSelectedUserAppId] = useState<UserAppId | undefined>()
@@ -68,62 +79,142 @@ export default function UserAppIdsPage() {
         </Button>
       </div>
 
-      <Card>
-        <CardHeader>
-          <CardTitle>Liste des IDs Utilisateur App</CardTitle>
-          <CardDescription>Total : {userAppIds?.length || 0} IDs utilisateur app</CardDescription>
+      <Card className="border border-border/50 shadow-sm">
+        <CardHeader className="border-b border-border/50 bg-muted/30">
+          <CardTitle className="text-lg font-semibold">Filtres</CardTitle>
+          <CardDescription className="text-sm">Rechercher et filtrer les IDs utilisateur app</CardDescription>
         </CardHeader>
-        <CardContent>
+        <CardContent className="pt-6">
+          <div className="grid gap-4 md:grid-cols-3">
+            <div className="space-y-2">
+              <Label htmlFor="search">Rechercher</Label>
+              <div className="relative">
+                <Search className="absolute left-2.5 top-2.5 h-4 w-4 text-muted-foreground" />
+                <Input
+                  id="search"
+                  placeholder="Rechercher par ID utilisateur app..."
+                  value={filters.search || ""}
+                  onChange={(e) => setFilters({ ...filters, search: e.target.value || undefined, page: 1 })}
+                  className="pl-8"
+                />
+              </div>
+            </div>
+            <div className="space-y-2">
+              <Label htmlFor="app_name">Plateforme</Label>
+              <Select
+                value={filters.app_name || "all"}
+                onValueChange={(value) =>
+                  setFilters({ ...filters, app_name: value === "all" ? undefined : value, page: 1 })
+                }
+              >
+                <SelectTrigger id="app_name">
+                  <SelectValue />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="all">Toutes les Plateformes</SelectItem>
+                  {platforms?.results?.map((platform) => (
+                    <SelectItem key={platform.id} value={platform.id}>
+                      {platform.name}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+            </div>
+          </div>
+        </CardContent>
+      </Card>
+
+      <Card className="border border-border/50 shadow-sm">
+        <CardHeader className="border-b border-border/50 bg-muted/30">
+          <div className="flex items-center justify-between">
+            <div>
+              <CardTitle className="text-lg font-semibold">Liste des IDs Utilisateur App</CardTitle>
+              <CardDescription className="text-sm mt-1">Total : {userAppIdsData?.count || 0} IDs utilisateur app</CardDescription>
+            </div>
+          </div>
+        </CardHeader>
+        <CardContent className="p-0">
           {isLoading ? (
-            <div className="flex justify-center py-8">
-              <Loader2 className="h-8 w-8 animate-spin text-muted-foreground" />
+            <div className="flex justify-center py-12">
+              <Loader2 className="h-8 w-8 animate-spin text-primary" />
             </div>
           ) : userAppIds && userAppIds.length > 0 ? (
-            <Table>
-              <TableHeader>
-                <TableRow>
-                  <TableHead>ID</TableHead>
-                  <TableHead>ID Utilisateur App</TableHead>
-                  <TableHead>Nom de l'App</TableHead>
-                  <TableHead>Utilisateur Telegram</TableHead>
-                  <TableHead>Créé le</TableHead>
-                  <TableHead className="text-right">Actions</TableHead>
-                </TableRow>
-              </TableHeader>
-              <TableBody>
-                {userAppIds.map((userAppId) => (
-                  <TableRow key={userAppId.id}>
-                    <TableCell className="font-medium">
-                      <div className="flex items-center gap-2">
-                        {userAppId.id}
-                        <CopyButton value={userAppId.id} />
-                      </div>
-                    </TableCell>
-                    <TableCell>
-                      <div className="flex items-center gap-2">
-                        <Badge variant="outline">{userAppId.user_app_id}</Badge>
-                        <CopyButton value={userAppId.user_app_id} />
-                      </div>
-                    </TableCell>
-                    <TableCell className="font-mono text-xs">{userAppId.app_name}</TableCell>
-                    <TableCell>{userAppId.telegram_user || "-"}</TableCell>
-                    <TableCell>{new Date(userAppId.created_at).toLocaleDateString()}</TableCell>
-                    <TableCell className="text-right">
-                      <div className="flex justify-end gap-2">
-                        <Button variant="ghost" size="icon" onClick={() => handleEdit(userAppId)}>
-                          <Pencil className="h-4 w-4" />
-                        </Button>
-                        <Button variant="ghost" size="icon" onClick={() => handleDelete(userAppId)}>
-                          <Trash2 className="h-4 w-4 text-destructive" />
-                        </Button>
-                      </div>
-                    </TableCell>
-                  </TableRow>
-                ))}
-              </TableBody>
-            </Table>
+            <>
+              <div className="overflow-x-auto">
+                <Table>
+                  <TableHeader>
+                    <TableRow className="bg-muted/50 hover:bg-muted/50 border-b border-border/50">
+                      <TableHead className="font-semibold text-muted-foreground h-12">ID</TableHead>
+                      <TableHead className="font-semibold text-muted-foreground">ID Utilisateur App</TableHead>
+                      <TableHead className="font-semibold text-muted-foreground">Nom de l'App</TableHead>
+                      <TableHead className="font-semibold text-muted-foreground">Utilisateur Telegram</TableHead>
+                      <TableHead className="font-semibold text-muted-foreground">Crée le</TableHead>
+                      <TableHead className="text-right font-semibold text-muted-foreground">Actions</TableHead>
+                    </TableRow>
+                  </TableHeader>
+                  <TableBody>
+                    {userAppIds.map((userAppId, index) => (
+                      <TableRow key={userAppId.id} className={index % 2 === 0 ? "bg-card" : "bg-muted/20"}>
+                        <TableCell className="font-medium text-foreground">
+                          <div className="flex items-center gap-2">
+                            {userAppId.id}
+                            <CopyButton value={userAppId.id} />
+                          </div>
+                        </TableCell>
+                        <TableCell className="text-foreground">
+                          <div className="flex items-center gap-2">
+                            <Badge variant="outline" className="font-mono">{userAppId.user_app_id}</Badge>
+                            <CopyButton value={userAppId.user_app_id} className="h-7 w-7" />
+                          </div>
+                        </TableCell>
+                        <TableCell className="text-foreground">
+                          {userAppId.app_details?.name || userAppId.app_name || "-"}
+                        </TableCell>
+                        <TableCell className="text-foreground">{userAppId.telegram_user || "-"}</TableCell>
+                        <TableCell className="text-muted-foreground text-sm">{new Date(userAppId.created_at).toLocaleDateString()}</TableCell>
+                        <TableCell className="text-right">
+                          <div className="flex justify-end gap-2">
+                            <Button variant="ghost" size="icon" onClick={() => handleEdit(userAppId)}>
+                              <Pencil className="h-4 w-4" />
+                            </Button>
+                            <Button variant="ghost" size="icon" onClick={() => handleDelete(userAppId)}>
+                              <Trash2 className="h-4 w-4 text-destructive" />
+                            </Button>
+                          </div>
+                        </TableCell>
+                      </TableRow>
+                    ))}
+                  </TableBody>
+                </Table>
+              </div>
+              {userAppIdsData && (userAppIdsData.next || userAppIdsData.previous) && (
+                <div className="flex items-center justify-between px-6 py-4 border-t border-border/50">
+                  <div className="text-sm text-muted-foreground">
+                    Page {filters.page || 1} sur {Math.ceil((userAppIdsData.count || 0) / (filters.page_size || 10))}
+                  </div>
+                  <div className="flex gap-2">
+                    <Button
+                      variant="outline"
+                      size="sm"
+                      onClick={() => setFilters({ ...filters, page: (filters.page || 1) - 1 })}
+                      disabled={!userAppIdsData.previous}
+                    >
+                      Précédent
+                    </Button>
+                    <Button
+                      variant="outline"
+                      size="sm"
+                      onClick={() => setFilters({ ...filters, page: (filters.page || 1) + 1 })}
+                      disabled={!userAppIdsData.next}
+                    >
+                      Suivant
+                    </Button>
+                  </div>
+                </div>
+              )}
+            </>
           ) : (
-            <div className="text-center py-8 text-muted-foreground">Aucun ID utilisateur app trouvé</div>
+            <div className="text-center py-12 text-muted-foreground">Aucun ID utilisateur app trouvé</div>
           )}
         </CardContent>
       </Card>

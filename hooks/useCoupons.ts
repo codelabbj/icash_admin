@@ -43,11 +43,18 @@ export interface CouponInput {
   code: string
 }
 
-export function useCoupons() {
+export interface CouponFilters {
+  page?: number
+  page_size?: number
+  search?: string
+  bet_app?: string
+}
+
+export function useCoupons(filters: CouponFilters = {}) {
   return useQuery({
-    queryKey: ["coupons"],
+    queryKey: ["coupons", filters],
     queryFn: async () => {
-      const res = await api.get<CouponsResponse>("/mobcash/coupon")
+      const res = await api.get<CouponsResponse>("/mobcash/coupon", { params: filters })
       return res.data
     },
   })
