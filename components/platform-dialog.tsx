@@ -51,6 +51,8 @@ export function PlatformDialog({ open, onOpenChange, platform }: PlatformDialogP
     max_deposit: 100000,
     minimun_with: 300,
     max_win: 1000000,
+    active_for_deposit: false,
+    active_for_with: false,
   })
 
   useEffect(() => {
@@ -72,6 +74,8 @@ export function PlatformDialog({ open, onOpenChange, platform }: PlatformDialogP
         max_deposit: platform.max_deposit,
         minimun_with: platform.minimun_with,
         max_win: platform.max_win,
+        active_for_deposit: platform.active_for_deposit ?? false,
+        active_for_with: platform.active_for_with ?? false,
       })
       setSelectedFile(null)
       setPreviewUrl(platform.image || null)
@@ -93,6 +97,8 @@ export function PlatformDialog({ open, onOpenChange, platform }: PlatformDialogP
         max_deposit: 100000,
         minimun_with: 300,
         max_win: 1000000,
+        active_for_deposit: false,
+        active_for_with: false,
       })
       setSelectedFile(null)
       setPreviewUrl(null)
@@ -141,6 +147,8 @@ export function PlatformDialog({ open, onOpenChange, platform }: PlatformDialogP
           max_deposit: formData.max_deposit,
           minimun_with: formData.minimun_with,
           max_win: formData.max_win,
+          active_for_deposit: formData.active_for_deposit,
+          active_for_with: formData.active_for_with,
         }
 
         // Only include these fields if they have values
@@ -189,6 +197,8 @@ export function PlatformDialog({ open, onOpenChange, platform }: PlatformDialogP
               max_deposit: 100000,
               minimun_with: 300,
               max_win: 1000000,
+              active_for_deposit: false,
+              active_for_with: false,
             })
             setSelectedFile(null)
             setPreviewUrl(null)
@@ -386,6 +396,26 @@ export function PlatformDialog({ open, onOpenChange, platform }: PlatformDialogP
                 id="enable"
                 checked={formData.enable}
                 onCheckedChange={(checked) => setFormData({ ...formData, enable: checked })}
+                disabled={isPending || isUploading}
+              />
+            </div>
+
+            <div className="flex items-center justify-between space-x-2">
+              <Label htmlFor="active_for_deposit">Actif pour Dépôt</Label>
+              <Switch
+                id="active_for_deposit"
+                checked={formData.active_for_deposit}
+                onCheckedChange={(checked) => setFormData({ ...formData, active_for_deposit: checked })}
+                disabled={isPending || isUploading}
+              />
+            </div>
+
+            <div className="flex items-center justify-between space-x-2">
+              <Label htmlFor="active_for_with">Actif pour Retrait</Label>
+              <Switch
+                id="active_for_with"
+                checked={formData.active_for_with}
+                onCheckedChange={(checked) => setFormData({ ...formData, active_for_with: checked })}
                 disabled={isPending || isUploading}
               />
             </div>

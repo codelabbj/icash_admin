@@ -22,6 +22,8 @@ export interface Platform {
   max_deposit: number
   minimun_with: number
   max_win: number
+  active_for_deposit: boolean
+  active_for_with: boolean
 }
 
 export type PlatformInput = Omit<Platform, "id">
