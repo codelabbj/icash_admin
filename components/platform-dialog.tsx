@@ -98,7 +98,6 @@ export function PlatformDialog({ open, onOpenChange, platform }: PlatformDialogP
             reader.readAsDataURL(file)
         }
     }
-    }
 
     const handleSubmit = (e: React.FormEvent) => {
         e.preventDefault()

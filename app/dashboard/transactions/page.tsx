@@ -2,7 +2,7 @@
 
 import { useState } from "react"
 import { useTransactions, useCheckTransactionStatus, type Transaction, type TransactionFilters } from "@/hooks/useTransactions"
-import { useNetworks } from "@/hooks/useNetworks"
+import { useNetworks, type Network } from "@/hooks/useNetworks"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
@@ -13,6 +13,7 @@ import { Badge } from "@/components/ui/badge"
 import { Loader2, Plus, Search, RefreshCw, AlertCircle } from "lucide-react"
 import { CreateTransactionDialog } from "@/components/create-transaction-dialog"
 import { ChangeStatusDialog } from "@/components/change-status-dialog"
+import { ShowStatusDialog } from "@/components/show-status-dialog"
 import { CopyButton } from "@/components/copy-button"
 
 export default function TransactionsPage() {
@@ -27,6 +28,7 @@ export default function TransactionsPage() {
 
   const [createDialogOpen, setCreateDialogOpen] = useState(false)
   const [statusDialogOpen, setStatusDialogOpen] = useState(false)
+  const [showStatusDialogOpen, setShowStatusDialogOpen] = useState(false)
   const [selectedTransaction, setSelectedTransaction] = useState<Transaction | null>(null)
 
   const handleChangeStatus = (transaction: Transaction) => {
@@ -34,8 +36,9 @@ export default function TransactionsPage() {
     setStatusDialogOpen(true)
   }
 
-  const handleCheckStatus = (reference: string) => {
-    checkStatus.mutate({ reference })
+  const handleShowStatus = (transaction: Transaction) => {
+    setSelectedTransaction(transaction)
+    setShowStatusDialogOpen(true)
   }
 
   const getStatusLabel = (status: string) => {
@@ -100,7 +103,7 @@ export default function TransactionsPage() {
 
   const getNetworkName = (networkId: number | null) => {
     if (!networkId) return "-"
-    return networks?.results?.find((n) => n.id === networkId)?.public_name || "-"
+    return networks?.find((n: Network) => n.id === networkId)?.public_name || "-"
   }
 
   return (
@@ -203,7 +206,7 @@ export default function TransactionsPage() {
                 </SelectTrigger>
                 <SelectContent>
                   <SelectItem value="all">Tous les Réseaux</SelectItem>
-                  {networks?.results?.map((network) => (
+                  {networks?.map((network: Network) => (
                     <SelectItem key={network.id} value={network.id.toString()}>
                       {network.public_name}
                     </SelectItem>
@@ -284,7 +287,7 @@ export default function TransactionsPage() {
                     </TableRow>
                   </TableHeader>
                   <TableBody>
-                    {transactionsData.results.map((transaction, index) => (
+                    {transactionsData.results.map((transaction: Transaction, index: number) => (
                       <TableRow key={transaction.id} className={index % 2 === 0 ? "bg-card" : "bg-muted/20"}>
                         <TableCell className="font-mono text-xs text-foreground">
                           <div className="flex items-center gap-2">
@@ -333,16 +336,11 @@ export default function TransactionsPage() {
                             <Button
                               variant="ghost"
                               size="sm"
-                              onClick={() => handleCheckStatus(transaction.reference)}
-                              disabled={checkStatus.isPending}
+                              onClick={() => handleShowStatus(transaction)}
                               className="font-medium text-blue-600 hover:text-blue-700"
                             >
-                              {checkStatus.isPending ? (
-                                <Loader2 className="h-3 w-3 animate-spin mr-1" />
-                              ) : (
-                                <RefreshCw className="h-4 w-4 mr-1" />
-                              )}
-                              Vérifier Statut
+                              <RefreshCw className="h-4 w-4 mr-1" />
+                              Afficher Statut
                             </Button>
                             <Button variant="ghost" size="sm" onClick={() => handleChangeStatus(transaction)} className="font-medium">
                               <RefreshCw className="h-4 w-4 mr-1" />
@@ -390,6 +388,11 @@ export default function TransactionsPage() {
       <ChangeStatusDialog
         open={statusDialogOpen}
         onOpenChange={setStatusDialogOpen}
+        transaction={selectedTransaction}
+      />
+      <ShowStatusDialog
+        open={showStatusDialogOpen}
+        onOpenChange={setShowStatusDialogOpen}
         transaction={selectedTransaction}
       />
     </div>

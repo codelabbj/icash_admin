@@ -102,7 +102,6 @@ export interface CreateWithdrawalInput {
 }
 
 export interface ChangeStatusInput {
-  status: "accept" | "reject" | "pending"
   reference: string
 }
 
@@ -155,7 +154,7 @@ export function useChangeTransactionStatus() {
 
   return useMutation({
     mutationFn: async (data: ChangeStatusInput) => {
-      const res = await api.put(`/mobcash/transactions/${data.reference}/status`, { status: data.status })
+      const res = await api.put(`/mobcash/transactions/${data.reference}/status`, {})
       return res.data
     },
     onSuccess: () => {
@@ -170,7 +169,7 @@ export function useCheckTransactionStatus() {
 
   return useMutation({
     mutationFn: async (data: CheckStatusInput) => {
-      const res = await api.post(`/mobcash/transactions/check-status/${data.reference}`)
+      const res = await api.get(`/mobcash/show-transaction-status?reference=${data.reference}`)
       return res.data
     },
     onSuccess: () => {

@@ -86,8 +86,7 @@ export default function UsersPage() {
               <Table>
                 <TableHeader>
                   <TableRow className="bg-muted/50 hover:bg-muted/50 border-b border-border/50">
-                    <TableHead className="font-semibold text-muted-foreground h-12">ID</TableHead>
-                    <TableHead className="font-semibold text-muted-foreground">Nom</TableHead>
+                    <TableHead className="font-semibold text-muted-foreground h-12">Nom</TableHead>
                     <TableHead className="font-semibold text-muted-foreground">Email</TableHead>
                     <TableHead className="font-semibold text-muted-foreground">Téléphone</TableHead>
                     <TableHead className="font-semibold text-muted-foreground">Code de Parrainage</TableHead>
@@ -98,12 +97,6 @@ export default function UsersPage() {
                 <TableBody>
                   {users.map((user, index) => (
                     <TableRow key={user.id} className={index % 2 === 0 ? "bg-card" : "bg-muted/20"}>
-                      <TableCell className="font-medium text-foreground">
-                        <div className="flex items-center gap-2">
-                          <span className="font-mono text-xs">{user.id}</span>
-                          <CopyButton value={user.id} />
-                        </div>
-                      </TableCell>
                       <TableCell className="text-foreground">
                         {user.first_name} {user.last_name}
                       </TableCell>

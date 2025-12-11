@@ -23,14 +23,9 @@ import {
 } from "@/components/ui/alert-dialog"
 
 export default function PlatformsPage() {
-  const [filters, setFilters] = useState<PlatformFilters>({
-    page: 1,
-    page_size: 10,
-  })
-  const { data: platformsData, isLoading } = usePlatforms(filters)
+  const [filters, setFilters] = useState<PlatformFilters>({})
+  const { data: platforms, isLoading } = usePlatforms(filters)
   const deletePlatform = useDeletePlatform()
-  
-  const platforms = platformsData?.results || []
   const [dialogOpen, setDialogOpen] = useState(false)
   const [selectedPlatform, setSelectedPlatform] = useState<Platform | undefined>()
   const [deleteDialogOpen, setDeleteDialogOpen] = useState(false)
@@ -90,7 +85,7 @@ export default function PlatformsPage() {
                   id="search"
                   placeholder="Rechercher par nom..."
                   value={filters.search || ""}
-                  onChange={(e) => setFilters({ ...filters, search: e.target.value || undefined, page: 1 })}
+                  onChange={(e) => setFilters({ ...filters, search: e.target.value || undefined })}
                   className="pl-8"
                 />
               </div>
@@ -103,7 +98,6 @@ export default function PlatformsPage() {
                   setFilters({
                     ...filters,
                     enable: value === "all" ? undefined : value === "enabled",
-                    page: 1,
                   })
                 }
               >
@@ -126,7 +120,7 @@ export default function PlatformsPage() {
           <div className="flex items-center justify-between">
             <div>
               <CardTitle className="text-lg font-semibold">Liste des Plateformes</CardTitle>
-              <CardDescription className="text-sm mt-1">Total : {platformsData?.count || 0} plateformes</CardDescription>
+              <CardDescription className="text-sm mt-1">Total : {platforms?.length || 0} plateformes</CardDescription>
             </div>
           </div>
         </CardHeader>
@@ -181,32 +175,7 @@ export default function PlatformsPage() {
                   ))}
                 </TableBody>
               </Table>
-            </div>
-              {platformsData && (platformsData.next || platformsData.previous) && (
-                <div className="flex items-center justify-between px-6 py-4 border-t border-border/50">
-                  <div className="text-sm text-muted-foreground">
-                    Page {filters.page || 1} sur {Math.ceil((platformsData.count || 0) / (filters.page_size || 10))}
-                  </div>
-                  <div className="flex gap-2">
-                    <Button
-                      variant="outline"
-                      size="sm"
-                      onClick={() => setFilters({ ...filters, page: (filters.page || 1) - 1 })}
-                      disabled={!platformsData.previous}
-                    >
-                      Précédent
-                    </Button>
-                    <Button
-                      variant="outline"
-                      size="sm"
-                      onClick={() => setFilters({ ...filters, page: (filters.page || 1) + 1 })}
-                      disabled={!platformsData.next}
-                    >
-                      Suivant
-                    </Button>
-                  </div>
-                </div>
-              )}
+              </div>
             </>
           ) : (
             <div className="text-center py-12 text-muted-foreground">Aucune plateforme trouvée</div>

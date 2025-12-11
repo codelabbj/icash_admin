@@ -1,15 +1,12 @@
 "use client"
 
 import { useState } from "react"
-import { useNetworks, useDeleteNetwork, type Network, type NetworkFilters } from "@/hooks/useNetworks"
+import { useNetworks, useDeleteNetwork, type Network } from "@/hooks/useNetworks"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
-import { Input } from "@/components/ui/input"
-import { Label } from "@/components/ui/label"
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table"
 import { Badge } from "@/components/ui/badge"
-import { Loader2, Plus, Pencil, Trash2, Search } from "lucide-react"
+import { Loader2, Plus, Pencil, Trash2 } from "lucide-react"
 import { NetworkDialog } from "@/components/network-dialog"
 import {
   AlertDialog,
@@ -23,14 +20,8 @@ import {
 } from "@/components/ui/alert-dialog"
 
 export default function NetworksPage() {
-  const [filters, setFilters] = useState<NetworkFilters>({
-    page: 1,
-    page_size: 10,
-  })
-  const { data: networksData, isLoading } = useNetworks(filters)
+  const { data: networks, isLoading } = useNetworks()
   const deleteNetwork = useDeleteNetwork()
-  
-  const networks = networksData?.results || []
 
   const [dialogOpen, setDialogOpen] = useState(false)
   const [selectedNetwork, setSelectedNetwork] = useState<Network | undefined>()
@@ -76,80 +67,13 @@ export default function NetworksPage() {
         </Button>
       </div>
 
-      <Card className="border border-border/50 shadow-sm">
-        <CardHeader className="border-b border-border/50 bg-muted/30">
-          <CardTitle className="text-lg font-semibold">Filtres</CardTitle>
-          <CardDescription className="text-sm">Rechercher et filtrer les réseaux</CardDescription>
-        </CardHeader>
-        <CardContent className="pt-6">
-          <div className="grid gap-4 md:grid-cols-3">
-            <div className="space-y-2">
-              <Label htmlFor="search">Rechercher</Label>
-              <div className="relative">
-                <Search className="absolute left-2.5 top-2.5 h-4 w-4 text-muted-foreground" />
-                <Input
-                  id="search"
-                  placeholder="Rechercher par nom..."
-                  value={filters.search || ""}
-                  onChange={(e) => setFilters({ ...filters, search: e.target.value || undefined, page: 1 })}
-                  className="pl-8"
-                />
-              </div>
-            </div>
-            <div className="space-y-2">
-              <Label htmlFor="enable">Statut</Label>
-              <Select
-                value={filters.enable === undefined ? "all" : filters.enable ? "enabled" : "disabled"}
-                onValueChange={(value) =>
-                  setFilters({
-                    ...filters,
-                    enable: value === "all" ? undefined : value === "enabled",
-                    page: 1,
-                  })
-                }
-              >
-                <SelectTrigger id="enable">
-                  <SelectValue />
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectItem value="all">Tous</SelectItem>
-                  <SelectItem value="enabled">Actif</SelectItem>
-                  <SelectItem value="disabled">Inactif</SelectItem>
-                </SelectContent>
-              </Select>
-            </div>
-            <div className="space-y-2">
-              <Label htmlFor="active_for_deposit">Dépôt Actif</Label>
-              <Select
-                value={filters.active_for_deposit === undefined ? "all" : filters.active_for_deposit ? "yes" : "no"}
-                onValueChange={(value) =>
-                  setFilters({
-                    ...filters,
-                    active_for_deposit: value === "all" ? undefined : value === "yes",
-                    page: 1,
-                  })
-                }
-              >
-                <SelectTrigger id="active_for_deposit">
-                  <SelectValue />
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectItem value="all">Tous</SelectItem>
-                  <SelectItem value="yes">Oui</SelectItem>
-                  <SelectItem value="no">Non</SelectItem>
-                </SelectContent>
-              </Select>
-            </div>
-          </div>
-        </CardContent>
-      </Card>
 
       <Card className="border border-border/50 shadow-sm">
         <CardHeader className="border-b border-border/50 bg-muted/30">
           <div className="flex items-center justify-between">
             <div>
               <CardTitle className="text-lg font-semibold">Liste des Réseaux</CardTitle>
-              <CardDescription className="text-sm mt-1">Total : {networksData?.count || 0} réseaux</CardDescription>
+              <CardDescription className="text-sm mt-1">Total : {networks?.length || 0} réseaux</CardDescription>
             </div>
           </div>
         </CardHeader>
@@ -213,31 +137,6 @@ export default function NetworksPage() {
               </TableBody>
             </Table>
               </div>
-              {networksData && (networksData.next || networksData.previous) && (
-                <div className="flex items-center justify-between px-6 py-4 border-t border-border/50">
-                  <div className="text-sm text-muted-foreground">
-                    Page {filters.page || 1} sur {Math.ceil((networksData.count || 0) / (filters.page_size || 10))}
-                  </div>
-                  <div className="flex gap-2">
-                    <Button
-                      variant="outline"
-                      size="sm"
-                      onClick={() => setFilters({ ...filters, page: (filters.page || 1) - 1 })}
-                      disabled={!networksData.previous}
-                    >
-                      Précédent
-                    </Button>
-                    <Button
-                      variant="outline"
-                      size="sm"
-                      onClick={() => setFilters({ ...filters, page: (filters.page || 1) + 1 })}
-                      disabled={!networksData.next}
-                    >
-                      Suivant
-                    </Button>
-                  </div>
-                </div>
-              )}
             </>
           ) : (
             <div className="text-center py-12 text-muted-foreground">Aucun réseau trouvé</div>

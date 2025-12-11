@@ -18,10 +18,12 @@ import {
   Bot,
   Ticket,
   Megaphone,
+  CreditCard,
 } from "lucide-react"
 
 const navItems = [
   { href: "/dashboard", label: "Tableau de Bord", icon: LayoutDashboard },
+  { href: "/dashboard/users", label: "Utilisateurs", icon: Users },
   { href: "/dashboard/bot-users", label: "Utilisateurs Bot", icon: Users },
   { href: "/dashboard/networks", label: "Réseaux", icon: Network },
   { href: "/dashboard/telephones", label: "Téléphones", icon: Phone },
@@ -31,9 +33,10 @@ const navItems = [
   { href: "/dashboard/coupons", label: "Coupons", icon: Ticket },
   { href: "/dashboard/advertisements", label: "Publicités", icon: Megaphone },
   { href: "/dashboard/transactions", label: "Transactions", icon: ArrowLeftRight },
+  { href: "/dashboard/recharges", label: "Recharges", icon: CreditCard },
   { href: "/dashboard/bot-transactions", label: "Transactions Bot", icon: Bot },
   { href: "/dashboard/platforms", label: "Plateformes", icon: Layers },
-  { href: "/dashboard/deposits", label: "Dépôts & Caisses", icon: Wallet },
+  // { href: "/dashboard/deposits", label: "Dépôts & Caisses", icon: Wallet },
   { href: "/dashboard/settings", label: "Paramètres", icon: Settings },
 ]
 

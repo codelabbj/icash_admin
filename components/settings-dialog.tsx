@@ -45,6 +45,9 @@ export function SettingsDialog({ open, onOpenChange }: SettingsDialogProps) {
     mtn_default_link: null,
     moov_phone: null,
     orange_phone: null,
+    orange_marchand_phone: null,
+    bf_orange_marchand_phone: null,
+    bf_moov_marchand_phone: null,
   })
 
   useEffect(() => {
@@ -68,6 +71,9 @@ export function SettingsDialog({ open, onOpenChange }: SettingsDialogProps) {
         mtn_default_link: settings.mtn_default_link || null,
         moov_phone: settings.moov_phone || null,
         orange_phone: settings.orange_phone || null,
+        orange_marchand_phone: settings.orange_marchand_phone || null,
+        bf_orange_marchand_phone: settings.bf_orange_marchand_phone || null,
+        bf_moov_marchand_phone: settings.bf_moov_marchand_phone || null,
       })
     }
   }, [settings])
@@ -102,7 +108,7 @@ export function SettingsDialog({ open, onOpenChange }: SettingsDialogProps) {
     })
 
     // Phone number validation (basic)
-    const phoneFields = ['whatsapp_phone', 'moov_phone', 'orange_phone']
+    const phoneFields = ['whatsapp_phone', 'moov_phone', 'orange_phone', 'orange_marchand_phone', 'bf_orange_marchand_phone', 'bf_moov_marchand_phone']
     phoneFields.forEach(phoneField => {
       const value = formData[phoneField as keyof SettingsInput] as string
       if (value && !value.match(/^\+?[0-9\s\-\(\)]+$/)) {
@@ -130,6 +136,9 @@ export function SettingsDialog({ open, onOpenChange }: SettingsDialogProps) {
       mtn_default_link: formData.mtn_default_link || null,
       moov_phone: formData.moov_phone || null,
       orange_phone: formData.orange_phone || null,
+      orange_marchand_phone: formData.orange_marchand_phone || null,
+      bf_orange_marchand_phone: formData.bf_orange_marchand_phone || null,
+      bf_moov_marchand_phone: formData.bf_moov_marchand_phone || null,
     }
     updateSettings.mutate(submitData, {
       onSuccess: () => {
@@ -394,6 +403,39 @@ export function SettingsDialog({ open, onOpenChange }: SettingsDialogProps) {
                 value={formData.orange_phone || ""}
                 onChange={(e) => setFormData({ ...formData, orange_phone: e.target.value || null })}
                 placeholder="+229XXXXXXXXX"
+                disabled={updateSettings.isPending}
+              />
+            </div>
+
+            <div className="space-y-2">
+              <Label htmlFor="orange_marchand_phone">Téléphone Orange Marchand</Label>
+              <Input
+                id="orange_marchand_phone"
+                value={formData.orange_marchand_phone || ""}
+                onChange={(e) => setFormData({ ...formData, orange_marchand_phone: e.target.value || null })}
+                placeholder="+229XXXXXXXXX"
+                disabled={updateSettings.isPending}
+              />
+            </div>
+
+            <div className="space-y-2">
+              <Label htmlFor="bf_orange_marchand_phone">Téléphone Orange Marchand (BF)</Label>
+              <Input
+                id="bf_orange_marchand_phone"
+                value={formData.bf_orange_marchand_phone || ""}
+                onChange={(e) => setFormData({ ...formData, bf_orange_marchand_phone: e.target.value || null })}
+                placeholder="+226XXXXXXXXX"
+                disabled={updateSettings.isPending}
+              />
+            </div>
+
+            <div className="space-y-2">
+              <Label htmlFor="bf_moov_marchand_phone">Téléphone Moov Marchand (BF)</Label>
+              <Input
+                id="bf_moov_marchand_phone"
+                value={formData.bf_moov_marchand_phone || ""}
+                onChange={(e) => setFormData({ ...formData, bf_moov_marchand_phone: e.target.value || null })}
+                placeholder="+226XXXXXXXXX"
                 disabled={updateSettings.isPending}
               />
             </div>

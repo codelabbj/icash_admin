@@ -20,7 +20,7 @@ function detectLang(text: string): "fr" | "en" {
 
 api.interceptors.request.use((config) => {
   // Don't add token to login/auth endpoints
-  const isAuthEndpoint = config.url?.includes('/auth/login') || config.url?.includes('/auth/refresh')
+  const isAuthEndpoint = config.url?.includes('auth/login') || config.url?.includes('auth/refresh')
 
   if (!isAuthEndpoint) {
     const token = localStorage.getItem("access_token")
@@ -81,9 +81,9 @@ api.interceptors.response.use(
                 return Promise.reject(new Error("No refresh token available"))
             }
 
-            console.log("🔐 Calling refresh endpoint:", `${process.env.NEXT_PUBLIC_BASE_URL}/auth/refresh`)
+            console.log("🔐 Calling refresh endpoint:", `${process.env.NEXT_PUBLIC_BASE_URL}auth/refresh`)
 
-            return axios.post(`${process.env.NEXT_PUBLIC_BASE_URL}/auth/refresh`, { refresh })
+            return axios.post(`${process.env.NEXT_PUBLIC_BASE_URL}auth/refresh`, { refresh })
                 .then(response => {
                     console.log("🔐 Refresh response:", response.data)
                     const newToken = response.data.access || response.data.token
@@ -167,6 +167,30 @@ api.interceptors.response.use(
                 : "Connection error. Check your internet connection and try again."
 
             toast.error(networkErrorMsg, {
+                style: {
+                    direction: "ltr",
+                    fontFamily: "sans-serif",
+                },
+            })
+            return Promise.reject(error)
+        }
+
+        // 🚫 Handle 404 Not Found errors
+        if (error.response?.status === 404) {
+            const notFoundMsg = "Page ou ressource non trouvée. Vérifiez l'URL et réessayez."
+            toast.error(notFoundMsg, {
+                style: {
+                    direction: "ltr",
+                    fontFamily: "sans-serif",
+                },
+            })
+            return Promise.reject(error)
+        }
+
+        // 💥 Handle 500+ Server errors
+        if (error.response?.status >= 500) {
+            const serverErrorMsg = "Erreur serveur interne. Le problème a été signalé, veuillez réessayer plus tard."
+            toast.error(serverErrorMsg, {
                 style: {
                     direction: "ltr",
                     fontFamily: "sans-serif",

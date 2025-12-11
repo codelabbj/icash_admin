@@ -100,7 +100,7 @@ export default function BotTransactionsPage() {
 
   const getNetworkName = (networkId: number | null) => {
     if (!networkId) return "-"
-    return networks?.results?.find((n) => n.id === networkId)?.public_name || "-"
+    return networks?.find((n) => n.id === networkId)?.public_name || "-"
   }
 
   return (
@@ -206,7 +206,7 @@ export default function BotTransactionsPage() {
                 </SelectTrigger>
                 <SelectContent>
                   <SelectItem value="all">Tous les Réseaux</SelectItem>
-                  {networks?.results?.map((network) => (
+                  {networks?.map((network) => (
                     <SelectItem key={network.id} value={network.id.toString()}>
                       {network.public_name}
                     </SelectItem>

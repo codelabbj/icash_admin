@@ -24,9 +24,16 @@ export interface Settings {
   mtn_default_link: string | null
   moov_phone: string | null
   orange_phone: string | null
+  orange_marchand_phone: string | null
+  bf_orange_marchand_phone: string | null
+  bf_moov_marchand_phone: string | null
 }
 
-export type SettingsInput = Omit<Settings, "id">
+export type SettingsInput = Omit<Settings, "id"> & {
+  orange_marchand_phone?: string | null
+  bf_orange_marchand_phone?: string | null
+  bf_moov_marchand_phone?: string | null
+}
 
 export function useSettings() {
     return useQuery({

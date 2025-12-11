@@ -71,6 +71,19 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
         </aside>
         <main className="flex-1 p-8 overflow-y-auto h-[calc(100vh-5rem)]">{children}</main>
       </div>
+      <footer className="border-t border-border/40 bg-card/30 backdrop-blur-sm py-4 px-8">
+        <div className="text-center text-sm text-muted-foreground">
+          Développé par{" "}
+          <a
+            href="https://codelab.bj"
+            target="_blank"
+            rel="noopener noreferrer"
+            className="font-medium text-primary hover:text-primary/80 transition-colors"
+          >
+            CodeLab
+          </a>
+        </div>
+      </footer>
     </div>
   )
 }

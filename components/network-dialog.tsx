@@ -34,7 +34,7 @@ const NETWORK_CHOICES = [
 ]
 
 const API_CHOICES = [
-    { value: "connect", label: "FASTXOF Connect" },
+    { value: "connect", label: "Zefast Connect" },
 ]
 
 interface NetworkDialogProps {

@@ -1,7 +1,7 @@
 "use client"
 
 import { useState } from "react"
-import { useTelephones, useDeleteTelephone, type Telephone, type TelephoneFilters } from "@/hooks/useTelephones"
+import { useTelephones, useDeleteTelephone, type Telephone, type phoneParams } from "@/hooks/useTelephones"
 import { useNetworks } from "@/hooks/useNetworks"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
@@ -25,15 +25,10 @@ import {
 } from "@/components/ui/alert-dialog"
 
 export default function TelephonesPage() {
-  const [filters, setFilters] = useState<TelephoneFilters>({
-    page: 1,
-    page_size: 10,
-  })
-  const { data: telephonesData, isLoading } = useTelephones(filters)
+  const [filters, setFilters] = useState<phoneParams>({})
+  const { data: telephones, isLoading } = useTelephones(filters)
   const { data: networks } = useNetworks()
   const deleteTelephone = useDeleteTelephone()
-  
-  const telephones = telephonesData?.results || []
 
   const [dialogOpen, setDialogOpen] = useState(false)
   const [selectedTelephone, setSelectedTelephone] = useState<Telephone | undefined>()
@@ -67,7 +62,7 @@ export default function TelephonesPage() {
   }
 
   const getNetworkName = (networkId: number) => {
-    return networks?.results?.find((n) => n.id === networkId)?.public_name || "Unknown"
+    return networks?.find((n) => n.id === networkId)?.public_name || "Unknown"
   }
 
   return (
@@ -89,7 +84,7 @@ export default function TelephonesPage() {
           <CardDescription className="text-sm">Rechercher et filtrer les téléphones</CardDescription>
         </CardHeader>
         <CardContent className="pt-6">
-          <div className="grid gap-4 md:grid-cols-3">
+          <div className="grid gap-4 md:grid-cols-1">
             <div className="space-y-2">
               <Label htmlFor="search">Rechercher</Label>
               <div className="relative">
@@ -98,31 +93,10 @@ export default function TelephonesPage() {
                   id="search"
                   placeholder="Rechercher par numéro..."
                   value={filters.search || ""}
-                  onChange={(e) => setFilters({ ...filters, search: e.target.value || undefined, page: 1 })}
+                  onChange={(e) => setFilters({ ...filters, search: e.target.value || undefined })}
                   className="pl-8"
                 />
               </div>
-            </div>
-            <div className="space-y-2">
-              <Label htmlFor="network">Réseau</Label>
-              <Select
-                value={filters.network?.toString() || "all"}
-                onValueChange={(value) =>
-                  setFilters({ ...filters, network: value === "all" ? undefined : Number.parseInt(value), page: 1 })
-                }
-              >
-                <SelectTrigger id="network">
-                  <SelectValue />
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectItem value="all">Tous les Réseaux</SelectItem>
-                  {networks?.results?.map((network) => (
-                    <SelectItem key={network.id} value={network.id.toString()}>
-                      {network.public_name}
-                    </SelectItem>
-                  ))}
-                </SelectContent>
-              </Select>
             </div>
           </div>
         </CardContent>
@@ -133,7 +107,7 @@ export default function TelephonesPage() {
           <div className="flex items-center justify-between">
             <div>
               <CardTitle className="text-lg font-semibold">Liste des Téléphones</CardTitle>
-              <CardDescription className="text-sm mt-1">Total : {telephonesData?.count || 0} téléphones</CardDescription>
+              <CardDescription className="text-sm mt-1">Total : {telephones?.length || 0} téléphones</CardDescription>
             </div>
           </div>
         </CardHeader>
@@ -148,8 +122,7 @@ export default function TelephonesPage() {
             <Table>
               <TableHeader>
                     <TableRow className="bg-muted/50 hover:bg-muted/50 border-b border-border/50">
-                      <TableHead className="font-semibold text-muted-foreground h-12">ID</TableHead>
-                      <TableHead className="font-semibold text-muted-foreground">Numéro de Téléphone</TableHead>
+                      <TableHead className="font-semibold text-muted-foreground h-12">Numéro de Téléphone</TableHead>
                       <TableHead className="font-semibold text-muted-foreground">Réseau</TableHead>
                       <TableHead className="font-semibold text-muted-foreground">Utilisateur Telegram</TableHead>
                       <TableHead className="font-semibold text-muted-foreground">Créé le</TableHead>
@@ -159,12 +132,6 @@ export default function TelephonesPage() {
               <TableBody>
                     {telephones.map((telephone, index) => (
                       <TableRow key={telephone.id} className={index % 2 === 0 ? "bg-card" : "bg-muted/20"}>
-                        <TableCell className="font-medium text-foreground">
-                      <div className="flex items-center gap-2">
-                        {telephone.id}
-                        <CopyButton value={telephone.id} />
-                      </div>
-                    </TableCell>
                         <TableCell className="text-foreground">
                       <div className="flex items-center gap-2">
                         <Badge variant="outline">{telephone.phone}</Badge>
@@ -189,31 +156,6 @@ export default function TelephonesPage() {
               </TableBody>
             </Table>
               </div>
-              {telephonesData && (telephonesData.next || telephonesData.previous) && (
-                <div className="flex items-center justify-between px-6 py-4 border-t border-border/50">
-                  <div className="text-sm text-muted-foreground">
-                    Page {filters.page || 1} sur {Math.ceil((telephonesData.count || 0) / (filters.page_size || 10))}
-                  </div>
-                  <div className="flex gap-2">
-                    <Button
-                      variant="outline"
-                      size="sm"
-                      onClick={() => setFilters({ ...filters, page: (filters.page || 1) - 1 })}
-                      disabled={!telephonesData.previous}
-                    >
-                      Précédent
-                    </Button>
-                    <Button
-                      variant="outline"
-                      size="sm"
-                      onClick={() => setFilters({ ...filters, page: (filters.page || 1) + 1 })}
-                      disabled={!telephonesData.next}
-                    >
-                      Suivant
-                    </Button>
-                  </div>
-                </div>
-              )}
             </>
           ) : (
             <div className="text-center py-12 text-muted-foreground">Aucun téléphone trouvé</div>

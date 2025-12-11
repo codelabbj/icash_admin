@@ -1,7 +1,7 @@
 "use client"
 
 import { useState } from "react"
-import { useUserAppIds, useDeleteUserAppId, type UserAppId, type UserAppIdsFilters } from "@/hooks/useUserAppIds"
+import { useUserAppIds, useDeleteUserAppId, type UserAppId, type UserAppIdFilters } from "@/hooks/useUserAppIds"
 import { usePlatforms } from "@/hooks/usePlatforms"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
@@ -25,15 +25,10 @@ import {
 } from "@/components/ui/alert-dialog"
 
 export default function UserAppIdsPage() {
-  const [filters, setFilters] = useState<UserAppIdsFilters>({
-    page: 1,
-    page_size: 10,
-  })
-  const { data: userAppIdsData, isLoading } = useUserAppIds(filters)
-  const { data: platforms } = usePlatforms()
+  const [filters, setFilters] = useState<UserAppIdFilters>({})
+  const { data: userAppIds, isLoading } = useUserAppIds(filters)
+  const { data: platforms } = usePlatforms({})
   const deleteUserAppId = useDeleteUserAppId()
-  
-  const userAppIds = userAppIdsData?.results || []
 
   const [dialogOpen, setDialogOpen] = useState(false)
   const [selectedUserAppId, setSelectedUserAppId] = useState<UserAppId | undefined>()
@@ -94,7 +89,7 @@ export default function UserAppIdsPage() {
                   id="search"
                   placeholder="Rechercher par ID utilisateur app..."
                   value={filters.search || ""}
-                  onChange={(e) => setFilters({ ...filters, search: e.target.value || undefined, page: 1 })}
+                  onChange={(e) => setFilters({ ...filters, search: e.target.value || undefined })}
                   className="pl-8"
                 />
               </div>
@@ -104,7 +99,7 @@ export default function UserAppIdsPage() {
               <Select
                 value={filters.app_name || "all"}
                 onValueChange={(value) =>
-                  setFilters({ ...filters, app_name: value === "all" ? undefined : value, page: 1 })
+                  setFilters({ ...filters, app_name: value === "all" ? undefined : value })
                 }
               >
                 <SelectTrigger id="app_name">
@@ -112,7 +107,7 @@ export default function UserAppIdsPage() {
                 </SelectTrigger>
                 <SelectContent>
                   <SelectItem value="all">Toutes les Plateformes</SelectItem>
-                  {platforms?.results?.map((platform) => (
+                  {platforms?.map((platform) => (
                     <SelectItem key={platform.id} value={platform.id}>
                       {platform.name}
                     </SelectItem>
@@ -129,7 +124,7 @@ export default function UserAppIdsPage() {
           <div className="flex items-center justify-between">
             <div>
               <CardTitle className="text-lg font-semibold">Liste des IDs Utilisateur App</CardTitle>
-              <CardDescription className="text-sm mt-1">Total : {userAppIdsData?.count || 0} IDs utilisateur app</CardDescription>
+              <CardDescription className="text-sm mt-1">Total : {userAppIds?.length || 0} IDs utilisateur app</CardDescription>
             </div>
           </div>
         </CardHeader>
@@ -144,8 +139,7 @@ export default function UserAppIdsPage() {
             <Table>
               <TableHeader>
                     <TableRow className="bg-muted/50 hover:bg-muted/50 border-b border-border/50">
-                      <TableHead className="font-semibold text-muted-foreground h-12">ID</TableHead>
-                      <TableHead className="font-semibold text-muted-foreground">ID Utilisateur App</TableHead>
+                      <TableHead className="font-semibold text-muted-foreground h-12">ID Utilisateur App</TableHead>
                       <TableHead className="font-semibold text-muted-foreground">Nom de l'App</TableHead>
                       <TableHead className="font-semibold text-muted-foreground">Utilisateur Telegram</TableHead>
                       <TableHead className="font-semibold text-muted-foreground">Crée le</TableHead>
@@ -155,12 +149,6 @@ export default function UserAppIdsPage() {
               <TableBody>
                     {userAppIds.map((userAppId, index) => (
                       <TableRow key={userAppId.id} className={index % 2 === 0 ? "bg-card" : "bg-muted/20"}>
-                        <TableCell className="font-medium text-foreground">
-                      <div className="flex items-center gap-2">
-                        {userAppId.id}
-                        <CopyButton value={userAppId.id} />
-                      </div>
-                    </TableCell>
                         <TableCell className="text-foreground">
                       <div className="flex items-center gap-2">
                             <Badge variant="outline" className="font-mono">{userAppId.user_app_id}</Badge>
@@ -187,31 +175,6 @@ export default function UserAppIdsPage() {
               </TableBody>
             </Table>
               </div>
-              {userAppIdsData && (userAppIdsData.next || userAppIdsData.previous) && (
-                <div className="flex items-center justify-between px-6 py-4 border-t border-border/50">
-                  <div className="text-sm text-muted-foreground">
-                    Page {filters.page || 1} sur {Math.ceil((userAppIdsData.count || 0) / (filters.page_size || 10))}
-                  </div>
-                  <div className="flex gap-2">
-                    <Button
-                      variant="outline"
-                      size="sm"
-                      onClick={() => setFilters({ ...filters, page: (filters.page || 1) - 1 })}
-                      disabled={!userAppIdsData.previous}
-                    >
-                      Précédent
-                    </Button>
-                    <Button
-                      variant="outline"
-                      size="sm"
-                      onClick={() => setFilters({ ...filters, page: (filters.page || 1) + 1 })}
-                      disabled={!userAppIdsData.next}
-                    >
-                      Suivant
-                    </Button>
-                  </div>
-                </div>
-              )}
             </>
           ) : (
             <div className="text-center py-12 text-muted-foreground">Aucun ID utilisateur app trouvé</div>

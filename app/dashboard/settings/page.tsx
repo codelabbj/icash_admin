@@ -138,6 +138,18 @@ export default function SettingsPage() {
                 <Badge variant="outline">{settings.orange_phone || "N/A"}</Badge>
               </div>
               <div className="flex justify-between items-center">
+                <span className="text-sm text-muted-foreground">Téléphone Orange Marchand (BF)</span>
+                <Badge variant="outline">{settings.bf_orange_marchand_phone || "N/A"}</Badge>
+              </div>
+              <div className="flex justify-between items-center">
+                <span className="text-sm text-muted-foreground">Téléphone Moov Marchand (BF)</span>
+                <Badge variant="outline">{settings.bf_moov_marchand_phone || "N/A"}</Badge>
+              </div>
+              <div className="flex justify-between items-center">
+                <span className="text-sm text-muted-foreground">Téléphone Orange Marchand</span>
+                <Badge variant="outline">{settings.orange_marchand_phone || "N/A"}</Badge>
+              </div>
+              <div className="flex justify-between items-center">
                 <span className="text-sm text-muted-foreground">Telegram</span>
                 <Badge variant="outline">{settings.telegram || "N/A"}</Badge>
               </div>
