@@ -192,11 +192,24 @@ export default function RechargesPage() {
                   </TableHeader>
                   <TableBody>
                     {rechargesData.results.map((recharge: Recharge, index: number) => (
-                      <TableRow key={recharge.id || recharge.uid} className={index % 2 === 0 ? "bg-card" : "bg-muted/20"}>
+                      <TableRow key={`${recharge.uid}-${index}`} className={index % 2 === 0 ? "bg-card" : "bg-muted/20"}>
                         <TableCell className="font-mono text-xs text-foreground">
-                          <div className="flex items-center gap-2">
-                            {recharge.payment_reference || recharge.reference || "-"}
-                            <CopyButton value={recharge.payment_reference || recharge.reference || ""} />
+                          <div className="space-y-2">
+                            <div className="flex items-center gap-2">
+                              {recharge.payment_reference || recharge.reference || "-"}
+                              <CopyButton value={recharge.payment_reference || recharge.reference || ""} />
+                            </div>
+                            {recharge.payment_proof && (
+                              <div className="flex items-center gap-2">
+                                <span className="text-xs text-muted-foreground">Preuve:</span>
+                                <img
+                                  src={recharge.payment_proof.startsWith('http') ? recharge.payment_proof : `https://api.zefast.net/media/${recharge.payment_proof}`}
+                                  alt="Preuve de paiement"
+                                  className="h-8 w-8 object-cover rounded border cursor-pointer"
+                                  onClick={() => window.open(recharge.payment_proof?.startsWith('http') ? recharge.payment_proof : `https://api.zefast.net/media/${recharge.payment_proof}`, '_blank')}
+                                />
+                              </div>
+                            )}
                           </div>
                         </TableCell>
                         <TableCell className="font-semibold text-foreground">

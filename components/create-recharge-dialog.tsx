@@ -4,13 +4,15 @@ import type React from "react"
 
 import { useState } from "react"
 import { useCreateRecharge, type CreateRechargeInput } from "@/hooks/useRecharges"
+import api from "@/lib/axios"
+import { toast } from "react-hot-toast"
 
 type RechargeFormData = {
     amount: string
     payment_method: string
     payment_reference: string
     notes: string
-    payment_proof: File | undefined
+    payment_proof: string // URL instead of File
 }
 import {
     Dialog,
@@ -40,25 +42,45 @@ export function CreateRechargeDialog({ open, onOpenChange }: CreateRechargeDialo
         payment_method: "",
         payment_reference: "",
         notes: "",
-        payment_proof: undefined,
+        payment_proof: "",
     })
 
     const [imagePreview, setImagePreview] = useState<string | null>(null)
+    const [isUploading, setIsUploading] = useState(false)
 
-    const handleImageChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const handleImageChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
         const file = e.target.files?.[0]
         if (file) {
-            setFormData({ ...formData, payment_proof: file })
-            const reader = new FileReader()
-            reader.onload = (e) => {
-                setImagePreview(e.target?.result as string)
+            setIsUploading(true)
+            try {
+                // Upload the file first
+                const uploadData = new FormData()
+                uploadData.append("file", file)
+                const uploadResponse = await api.post('/mobcash/upload', uploadData)
+                const uploadedUrl = uploadResponse.data.file
+
+                // Set the URL in form data
+                setFormData({ ...formData, payment_proof: uploadedUrl })
+
+                // Create preview from the uploaded file
+                const reader = new FileReader()
+                reader.onload = (e) => {
+                    setImagePreview(e.target?.result as string)
+                }
+                reader.readAsDataURL(file)
+
+                toast.success("Image téléversée avec succès!")
+            } catch (error) {
+                toast.error("Erreur lors du téléversement de l'image")
+                console.error("Upload error:", error)
+            } finally {
+                setIsUploading(false)
             }
-            reader.readAsDataURL(file)
         }
     }
 
     const removeImage = () => {
-        setFormData({ ...formData, payment_proof: undefined })
+        setFormData({ ...formData, payment_proof: "" })
         setImagePreview(null)
     }
 
@@ -72,7 +94,7 @@ export function CreateRechargeDialog({ open, onOpenChange }: CreateRechargeDialo
                         payment_method: "",
                         payment_reference: "",
                         notes: "",
-                        payment_proof: undefined,
+                        payment_proof: "",
                     })
                     setImagePreview(null)
                 },
@@ -85,7 +107,7 @@ export function CreateRechargeDialog({ open, onOpenChange }: CreateRechargeDialo
             payment_method: "",
             payment_reference: "",
             notes: "",
-            payment_proof: undefined,
+            payment_proof: "",
         })
         setImagePreview(null)
     }
@@ -99,15 +121,16 @@ export function CreateRechargeDialog({ open, onOpenChange }: CreateRechargeDialo
 
     return (
         <Dialog open={open} onOpenChange={handleOpenChange}>
-            <DialogContent className="max-w-2xl">
-                <DialogHeader>
+            <DialogContent className="max-w-2xl max-h-[90vh] flex flex-col">
+                <DialogHeader className="flex-shrink-0">
                     <DialogTitle>Créer une Recharge</DialogTitle>
                     <DialogDescription>
                         Soumettre une demande de recharge avec preuve de paiement
                     </DialogDescription>
                 </DialogHeader>
 
-                <form onSubmit={handleSubmit} className="space-y-4">
+                <div className="flex-1 overflow-y-auto pr-1">
+                    <form onSubmit={handleSubmit} className="space-y-4">
                         <div className="space-y-2">
                         <Label htmlFor="amount">Montant (FCFA) *</Label>
                         <Input
@@ -134,11 +157,9 @@ export function CreateRechargeDialog({ open, onOpenChange }: CreateRechargeDialo
                                 <SelectValue placeholder="Sélectionnez une méthode de paiement" />
                             </SelectTrigger>
                             <SelectContent>
-                                <SelectItem value="bank_transfer">Virement bancaire</SelectItem>
-                                <SelectItem value="mobile_money">Mobile Money</SelectItem>
-                                {/* <SelectItem value="crypto">Cryptomonnaie</SelectItem> */}
-                                <SelectItem value="card">Carte de crédit</SelectItem>
-                                <SelectItem value="cash">Espèces</SelectItem>
+                                <SelectItem value="BANK_TRANSFER">Virement bancaire</SelectItem>
+                                <SelectItem value="MOBILE_MONEY">Mobile Money</SelectItem>
+                                <SelectItem value="OTHER">Autre</SelectItem>
                             </SelectContent>
                         </Select>
                     </div>
@@ -199,35 +220,42 @@ export function CreateRechargeDialog({ open, onOpenChange }: CreateRechargeDialo
                                         type="file"
                                         accept="image/*"
                                         onChange={handleImageChange}
-                                        disabled={createRecharge.isPending}
+                                        disabled={createRecharge.isPending || isUploading}
                                         className="max-w-xs mx-auto"
                                     />
+                                    {isUploading && (
+                                        <div className="text-sm text-muted-foreground mt-2 flex items-center gap-2">
+                                            <Loader2 className="h-4 w-4 animate-spin" />
+                                            Téléversement en cours...
+                                        </div>
+                                    )}
                                 </div>
                             )}
                         </div>
-                    </div>
+                        </div>
 
-                    <DialogFooter>
-                        <Button
-                            type="button"
-                            variant="outline"
-                            onClick={() => handleOpenChange(false)}
-                            disabled={createRecharge.isPending}
-                        >
-                            Annuler
-                        </Button>
-                        <Button type="submit" disabled={createRecharge.isPending}>
-                            {createRecharge.isPending ? (
-                                <>
-                                    <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                                    Création...
-                                </>
-                            ) : (
-                                "Créer la Recharge"
-                            )}
-                        </Button>
-                    </DialogFooter>
-                </form>
+                        <div className="flex flex-col-reverse gap-2 sm:flex-row sm:justify-end pt-4">
+                            <Button
+                                type="button"
+                                variant="outline"
+                                onClick={() => handleOpenChange(false)}
+                                disabled={createRecharge.isPending}
+                            >
+                                Annuler
+                            </Button>
+                            <Button type="submit" disabled={createRecharge.isPending || isUploading}>
+                                {createRecharge.isPending ? (
+                                    <>
+                                        <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                                        Création...
+                                    </>
+                                ) : (
+                                    "Créer la Recharge"
+                                )}
+                            </Button>
+                        </div>
+                    </form>
+                </div>
             </DialogContent>
         </Dialog>
     )

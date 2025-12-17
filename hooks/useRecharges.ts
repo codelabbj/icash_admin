@@ -22,6 +22,8 @@ export interface Recharge {
   admin_notes: string | null
   reviewed_at: string | null
   processed_at: string | null
+  payment_reference?: string
+  payment_proof?: string
 }
 
 export interface RechargesResponse {
@@ -44,7 +46,7 @@ export interface CreateRechargeInput {
   payment_method: string
   payment_reference: string
   notes: string
-  payment_proof?: File
+  payment_proof?: string
 }
 
 export function useRecharges(filters: RechargeFilters = {}) {
@@ -62,21 +64,18 @@ export function useCreateRecharge() {
 
   return useMutation({
     mutationFn: async (data: CreateRechargeInput) => {
-      const formData = new FormData()
-      formData.append("amount", data.amount)
-      formData.append("payment_method", data.payment_method)
-      formData.append("payment_reference", data.payment_reference)
-      formData.append("notes", data.notes)
-
-      if (data.payment_proof) {
-        formData.append("payment_proof", data.payment_proof)
+      const payload: any = {
+        amount: data.amount,
+        payment_method: data.payment_method,
+        payment_reference: data.payment_reference,
+        notes: data.notes,
       }
 
-      const res = await api.post<Recharge>("/mobcash/recharge-mobcash-balance", formData, {
-        headers: {
-          "Content-Type": "multipart/form-data",
-        },
-      })
+      if (data.payment_proof) {
+        payload.payment_proof = data.payment_proof
+      }
+
+      const res = await api.post<Recharge>("/mobcash/recharge-mobcash-balance", payload)
       return res.data
     },
     onSuccess: () => {
