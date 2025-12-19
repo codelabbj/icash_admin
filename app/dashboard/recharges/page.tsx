@@ -195,9 +195,9 @@ export default function RechargesPage() {
                       <TableRow key={`${recharge.uid}-${index}`} className={index % 2 === 0 ? "bg-card" : "bg-muted/20"}>
                         <TableCell className="font-mono text-xs text-foreground">
                           <div className="space-y-2">
-                            <div className="flex items-center gap-2">
-                              {recharge.payment_reference || recharge.reference || "-"}
-                              <CopyButton value={recharge.payment_reference || recharge.reference || ""} />
+                          <div className="flex items-center gap-2">
+                            {recharge.payment_reference || recharge.reference || "-"}
+                            <CopyButton value={recharge.payment_reference || recharge.reference || ""} />
                             </div>
                             {recharge.payment_proof && (
                               <div className="flex items-center gap-2">

@@ -330,7 +330,15 @@ export default function TransactionsPage() {
                             "-"
                           )}
                         </TableCell>
-                        <TableCell className="text-muted-foreground text-sm">{new Date(transaction.created_at).toLocaleDateString()}</TableCell>
+                        <TableCell className="text-muted-foreground text-sm">
+                          {new Date(transaction.created_at).toLocaleDateString('fr-FR', {
+                            year: 'numeric',
+                            month: '2-digit',
+                            day: '2-digit',
+                            hour: '2-digit',
+                            minute: '2-digit'
+                          })}
+                        </TableCell>
                         <TableCell className="text-right">
                           <div className="flex gap-2 justify-end">
                             <Button

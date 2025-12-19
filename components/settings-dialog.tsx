@@ -47,6 +47,7 @@ export function SettingsDialog({ open, onOpenChange }: SettingsDialogProps) {
     orange_marchand_phone: null,
     bf_orange_marchand_phone: null,
     bf_moov_marchand_phone: null,
+    connect_pro_base_url: null,
   })
 
   useEffect(() => {
@@ -72,6 +73,7 @@ export function SettingsDialog({ open, onOpenChange }: SettingsDialogProps) {
         orange_marchand_phone: settings.orange_marchand_phone || null,
         bf_orange_marchand_phone: settings.bf_orange_marchand_phone || null,
         bf_moov_marchand_phone: settings.bf_moov_marchand_phone || null,
+        connect_pro_base_url: settings.connect_pro_base_url || null,
       })
     }
   }, [settings])
@@ -433,6 +435,17 @@ export function SettingsDialog({ open, onOpenChange }: SettingsDialogProps) {
                 value={formData.bf_moov_marchand_phone || ""}
                 onChange={(e) => setFormData({ ...formData, bf_moov_marchand_phone: e.target.value || null })}
                 placeholder="+226XXXXXXXXX"
+                disabled={updateSettings.isPending}
+              />
+            </div>
+
+            <div className="space-y-2">
+              <Label htmlFor="connect_pro_base_url">URL de Base Connect Pro</Label>
+              <Input
+                id="connect_pro_base_url"
+                value={formData.connect_pro_base_url || ""}
+                onChange={(e) => setFormData({ ...formData, connect_pro_base_url: e.target.value || null })}
+                placeholder="https://api.connectpro.com"
                 disabled={updateSettings.isPending}
               />
             </div>

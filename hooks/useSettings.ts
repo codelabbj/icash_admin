@@ -27,6 +27,7 @@ export interface Settings {
   orange_marchand_phone: string | null
   bf_orange_marchand_phone: string | null
   bf_moov_marchand_phone: string | null
+  connect_pro_base_url: string | null
 }
 
 export type SettingsInput = Omit<Settings, "id"> & {

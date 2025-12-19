@@ -63,11 +63,11 @@ export function CreateRechargeDialog({ open, onOpenChange }: CreateRechargeDialo
                 setFormData({ ...formData, payment_proof: uploadedUrl })
 
                 // Create preview from the uploaded file
-                const reader = new FileReader()
-                reader.onload = (e) => {
-                    setImagePreview(e.target?.result as string)
-                }
-                reader.readAsDataURL(file)
+            const reader = new FileReader()
+            reader.onload = (e) => {
+                setImagePreview(e.target?.result as string)
+            }
+            reader.readAsDataURL(file)
 
                 toast.success("Image téléversée avec succès!")
             } catch (error) {
@@ -130,7 +130,7 @@ export function CreateRechargeDialog({ open, onOpenChange }: CreateRechargeDialo
                 </DialogHeader>
 
                 <div className="flex-1 overflow-y-auto pr-1">
-                    <form onSubmit={handleSubmit} className="space-y-4">
+                <form onSubmit={handleSubmit} className="space-y-4">
                         <div className="space-y-2">
                         <Label htmlFor="amount">Montant (FCFA) *</Label>
                         <Input
@@ -232,29 +232,29 @@ export function CreateRechargeDialog({ open, onOpenChange }: CreateRechargeDialo
                                 </div>
                             )}
                         </div>
-                        </div>
+                    </div>
 
                         <div className="flex flex-col-reverse gap-2 sm:flex-row sm:justify-end pt-4">
-                            <Button
-                                type="button"
-                                variant="outline"
-                                onClick={() => handleOpenChange(false)}
-                                disabled={createRecharge.isPending}
-                            >
-                                Annuler
-                            </Button>
+                        <Button
+                            type="button"
+                            variant="outline"
+                            onClick={() => handleOpenChange(false)}
+                            disabled={createRecharge.isPending}
+                        >
+                            Annuler
+                        </Button>
                             <Button type="submit" disabled={createRecharge.isPending || isUploading}>
-                                {createRecharge.isPending ? (
-                                    <>
-                                        <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                                        Création...
-                                    </>
-                                ) : (
-                                    "Créer la Recharge"
-                                )}
-                            </Button>
+                            {createRecharge.isPending ? (
+                                <>
+                                    <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                                    Création...
+                                </>
+                            ) : (
+                                "Créer la Recharge"
+                            )}
+                        </Button>
                         </div>
-                    </form>
+                </form>
                 </div>
             </DialogContent>
         </Dialog>
