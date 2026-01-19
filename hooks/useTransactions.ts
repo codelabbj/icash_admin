@@ -193,7 +193,7 @@ export function useProcessTransaction() {
 
   return useMutation({
     mutationFn: async (data: ProcessTransactionInput) => {
-      const res = await api.post(`/api/admin/process-transaction/`, data)
+      const res = await api.post(`/mobcash/process-transaction`, data)
       return res.data
     },
     onSuccess: () => {
@@ -208,7 +208,7 @@ export function useUpdateTransactionStatus() {
 
   return useMutation({
     mutationFn: async (data: UpdateTransactionStatusInput) => {
-      const res = await api.post(`/api/admin/update-transaction-status/`, data)
+      const res = await api.post(`/mobcash/update-transaction-status`, data)
       return res.data
     },
     onSuccess: () => {
