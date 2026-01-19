@@ -109,6 +109,15 @@ export interface CheckStatusInput {
   reference: string
 }
 
+export interface ProcessTransactionInput {
+  reference: string
+}
+
+export interface UpdateTransactionStatusInput {
+  reference: string
+  new_status: string
+}
+
 export function useTransactions(filters: TransactionFilters = {}) {
   return useQuery({
     queryKey: ["transactions", filters],
@@ -174,6 +183,36 @@ export function useCheckTransactionStatus() {
     },
     onSuccess: () => {
       toast.success("Statut vérifié avec succès!")
+      queryClient.invalidateQueries({ queryKey: ["transactions"] })
+    },
+  })
+}
+
+export function useProcessTransaction() {
+  const queryClient = useQueryClient()
+
+  return useMutation({
+    mutationFn: async (data: ProcessTransactionInput) => {
+      const res = await api.post(`/api/admin/process-transaction/`, data)
+      return res.data
+    },
+    onSuccess: () => {
+      toast.success("Transaction traitée avec succès!")
+      queryClient.invalidateQueries({ queryKey: ["transactions"] })
+    },
+  })
+}
+
+export function useUpdateTransactionStatus() {
+  const queryClient = useQueryClient()
+
+  return useMutation({
+    mutationFn: async (data: UpdateTransactionStatusInput) => {
+      const res = await api.post(`/api/admin/update-transaction-status/`, data)
+      return res.data
+    },
+    onSuccess: () => {
+      toast.success("Statut de la transaction mis à jour avec succès!")
       queryClient.invalidateQueries({ queryKey: ["transactions"] })
     },
   })

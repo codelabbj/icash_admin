@@ -14,6 +14,8 @@ import { Loader2, Plus, Search, RefreshCw, AlertCircle } from "lucide-react"
 import { CreateTransactionDialog } from "@/components/create-transaction-dialog"
 import { ChangeStatusDialog } from "@/components/change-status-dialog"
 import { ShowStatusDialog } from "@/components/show-status-dialog"
+import { ProcessTransactionDialog } from "@/components/process-transaction-dialog"
+import { UpdateTransactionStatusDialog } from "@/components/update-transaction-status-dialog"
 import { CopyButton } from "@/components/copy-button"
 
 export default function TransactionsPage() {
@@ -29,6 +31,8 @@ export default function TransactionsPage() {
   const [createDialogOpen, setCreateDialogOpen] = useState(false)
   const [statusDialogOpen, setStatusDialogOpen] = useState(false)
   const [showStatusDialogOpen, setShowStatusDialogOpen] = useState(false)
+  const [processDialogOpen, setProcessDialogOpen] = useState(false)
+  const [updateStatusDialogOpen, setUpdateStatusDialogOpen] = useState(false)
   const [selectedTransaction, setSelectedTransaction] = useState<Transaction | null>(null)
 
   const handleChangeStatus = (transaction: Transaction) => {
@@ -39,6 +43,16 @@ export default function TransactionsPage() {
   const handleShowStatus = (transaction: Transaction) => {
     setSelectedTransaction(transaction)
     setShowStatusDialogOpen(true)
+  }
+
+  const handleProcessTransaction = (transaction: Transaction) => {
+    setSelectedTransaction(transaction)
+    setProcessDialogOpen(true)
+  }
+
+  const handleUpdateStatus = (transaction: Transaction) => {
+    setSelectedTransaction(transaction)
+    setUpdateStatusDialogOpen(true)
   }
 
   const getStatusLabel = (status: string) => {
@@ -325,7 +339,7 @@ export default function TransactionsPage() {
                         </TableCell>
                         <TableCell>
                           {transaction.source ? (
-                          <Badge variant="outline" className="font-medium">{transaction.source}</Badge>
+                            <Badge variant="outline" className="font-medium">{transaction.source}</Badge>
                           ) : (
                             "-"
                           )}
@@ -353,6 +367,24 @@ export default function TransactionsPage() {
                             <Button variant="ghost" size="sm" onClick={() => handleChangeStatus(transaction)} className="font-medium">
                               <RefreshCw className="h-4 w-4 mr-1" />
                               Changer Statut
+                            </Button>
+                            <Button
+                              variant="ghost"
+                              size="sm"
+                              onClick={() => handleProcessTransaction(transaction)}
+                              className="font-medium text-green-600 hover:text-green-700"
+                            >
+                              <RefreshCw className="h-4 w-4 mr-1" />
+                              Traiter
+                            </Button>
+                            <Button
+                              variant="ghost"
+                              size="sm"
+                              onClick={() => handleUpdateStatus(transaction)}
+                              className="font-medium text-purple-600 hover:text-purple-700"
+                            >
+                              <RefreshCw className="h-4 w-4 mr-1" />
+                              Update Statut
                             </Button>
                           </div>
                         </TableCell>
@@ -401,6 +433,16 @@ export default function TransactionsPage() {
       <ShowStatusDialog
         open={showStatusDialogOpen}
         onOpenChange={setShowStatusDialogOpen}
+        transaction={selectedTransaction}
+      />
+      <ProcessTransactionDialog
+        open={processDialogOpen}
+        onOpenChange={setProcessDialogOpen}
+        transaction={selectedTransaction}
+      />
+      <UpdateTransactionStatusDialog
+        open={updateStatusDialogOpen}
+        onOpenChange={setUpdateStatusDialogOpen}
         transaction={selectedTransaction}
       />
     </div>
