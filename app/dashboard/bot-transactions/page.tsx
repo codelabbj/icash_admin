@@ -10,10 +10,16 @@ import { Label } from "@/components/ui/label"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table"
 import { Badge } from "@/components/ui/badge"
-import { Loader2, Plus, Search, RefreshCw } from "lucide-react"
+import { Loader2, Plus, Search, RefreshCw, MoreVertical } from "lucide-react"
 import { CreateBotTransactionDialog } from "@/components/create-bot-transaction-dialog"
 import { ChangeBotStatusDialog } from "@/components/change-bot-status-dialog"
 import { CopyButton } from "@/components/copy-button"
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu"
 
 export default function BotTransactionsPage() {
   const [filters, setFilters] = useState<BotTransactionFilters>({
@@ -292,26 +298,31 @@ export default function BotTransactionsPage() {
                       </TableCell>
                       <TableCell className="text-muted-foreground text-sm">{new Date(transaction.created_at).toLocaleDateString()}</TableCell>
                       <TableCell className="text-right">
-                        <div className="flex gap-2 justify-end">
-                          <Button
-                            variant="ghost"
-                            size="sm"
-                            onClick={() => handleCheckStatus(transaction.reference)}
-                            disabled={checkStatus.isPending}
-                            className="font-medium text-blue-600 hover:text-blue-700"
-                          >
-                            {checkStatus.isPending ? (
-                              <Loader2 className="h-3 w-3 animate-spin mr-1" />
-                            ) : (
-                              <RefreshCw className="h-4 w-4 mr-1" />
-                            )}
-                            Vérifier Statut
-                          </Button>
-                          <Button variant="ghost" size="sm" onClick={() => handleChangeStatus(transaction)} className="font-medium">
-                            <RefreshCw className="h-4 w-4 mr-1" />
-                            Changer Statut
-                          </Button>
-                        </div>
+                        <DropdownMenu>
+                          <DropdownMenuTrigger asChild>
+                            <Button variant="ghost" size="icon">
+                              <MoreVertical className="h-4 w-4" />
+                            </Button>
+                          </DropdownMenuTrigger>
+                          <DropdownMenuContent align="end" className="w-[200px]">
+                            <DropdownMenuItem
+                              onClick={() => handleCheckStatus(transaction.reference)}
+                              disabled={checkStatus.isPending}
+                              className="text-blue-600"
+                            >
+                              {checkStatus.isPending ? (
+                                <Loader2 className="h-4 w-4 animate-spin mr-2" />
+                              ) : (
+                                <RefreshCw className="h-4 w-4 mr-2" />
+                              )}
+                              Vérifier Statut
+                            </DropdownMenuItem>
+                            <DropdownMenuItem onClick={() => handleChangeStatus(transaction)}>
+                              <RefreshCw className="h-4 w-4 mr-2" />
+                              Changer Statut
+                            </DropdownMenuItem>
+                          </DropdownMenuContent>
+                        </DropdownMenu>
                       </TableCell>
                     </TableRow>
                   ))}

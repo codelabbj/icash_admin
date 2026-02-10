@@ -9,8 +9,14 @@ import { Label } from "@/components/ui/label"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table"
 import { Badge } from "@/components/ui/badge"
-import { Loader2, Plus, Pencil, Trash2, Search } from "lucide-react"
+import { Loader2, Plus, Pencil, Trash2, Search, MoreVertical } from "lucide-react"
 import { PlatformDialog } from "@/components/platform-dialog"
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu"
 import {
   AlertDialog,
   AlertDialogAction,
@@ -131,50 +137,59 @@ export default function PlatformsPage() {
             </div>
           ) : platforms && platforms.length > 0 ? (
             <>
-            <div className="overflow-x-auto">
-              <Table>
-                <TableHeader>
-                  <TableRow className="bg-muted/50 hover:bg-muted/50 border-b border-border/50">
-                    <TableHead className="font-semibold text-muted-foreground h-12">Nom</TableHead>
-                    <TableHead className="font-semibold text-muted-foreground">Statut</TableHead>
-                    <TableHead className="font-semibold text-muted-foreground">Dépôt Min</TableHead>
-                    <TableHead className="font-semibold text-muted-foreground">Dépôt Max</TableHead>
-                    <TableHead className="font-semibold text-muted-foreground">Retrait Min</TableHead>
-                    <TableHead className="font-semibold text-muted-foreground">Gain Max</TableHead>
-                    <TableHead className="font-semibold text-muted-foreground">Localisation</TableHead>
+              <div className="overflow-x-auto">
+                <Table>
+                  <TableHeader>
+                    <TableRow className="bg-muted/50 hover:bg-muted/50 border-b border-border/50">
+                      <TableHead className="font-semibold text-muted-foreground h-12">Nom</TableHead>
+                      <TableHead className="font-semibold text-muted-foreground">Statut</TableHead>
+                      <TableHead className="font-semibold text-muted-foreground">Dépôt Min</TableHead>
+                      <TableHead className="font-semibold text-muted-foreground">Dépôt Max</TableHead>
+                      <TableHead className="font-semibold text-muted-foreground">Retrait Min</TableHead>
+                      <TableHead className="font-semibold text-muted-foreground">Gain Max</TableHead>
+                      <TableHead className="font-semibold text-muted-foreground">Localisation</TableHead>
                       <TableHead className="text-right font-semibold text-muted-foreground">Actions</TableHead>
-                  </TableRow>
-                </TableHeader>
-                <TableBody>
-                  {platforms.map((platform, index) => (
-                    <TableRow key={platform.id} className={index % 2 === 0 ? "bg-card" : "bg-muted/20"}>
-                      <TableCell className="font-semibold text-foreground">{platform.name}</TableCell>
-                      <TableCell>
-                        <Badge variant={platform.enable ? "default" : "secondary"} className="font-medium">
-                          {platform.enable ? "Actif" : "Inactif"}
-                        </Badge>
-                      </TableCell>
-                      <TableCell className="text-foreground">{platform.minimun_deposit} FCFA</TableCell>
-                      <TableCell className="text-foreground">{platform.max_deposit} FCFA</TableCell>
-                      <TableCell className="text-foreground">{platform.minimun_with} FCFA</TableCell>
-                      <TableCell className="text-foreground">{platform.max_win} FCFA</TableCell>
-                      <TableCell className="text-muted-foreground text-sm">
-                        {platform.city && platform.street ? `${platform.city}, ${platform.street}` : "-"}
-                      </TableCell>
-                        <TableCell className="text-right">
-                          <div className="flex justify-end gap-2">
-                            <Button variant="ghost" size="icon" onClick={() => handleEdit(platform)}>
-                              <Pencil className="h-4 w-4" />
-                            </Button>
-                            <Button variant="ghost" size="icon" onClick={() => handleDelete(platform)}>
-                              <Trash2 className="h-4 w-4 text-destructive" />
-                            </Button>
-                          </div>
-                        </TableCell>
                     </TableRow>
-                  ))}
-                </TableBody>
-              </Table>
+                  </TableHeader>
+                  <TableBody>
+                    {platforms.map((platform, index) => (
+                      <TableRow key={platform.id} className={index % 2 === 0 ? "bg-card" : "bg-muted/20"}>
+                        <TableCell className="font-semibold text-foreground">{platform.name}</TableCell>
+                        <TableCell>
+                          <Badge variant={platform.enable ? "default" : "secondary"} className="font-medium">
+                            {platform.enable ? "Actif" : "Inactif"}
+                          </Badge>
+                        </TableCell>
+                        <TableCell className="text-foreground">{platform.minimun_deposit} FCFA</TableCell>
+                        <TableCell className="text-foreground">{platform.max_deposit} FCFA</TableCell>
+                        <TableCell className="text-foreground">{platform.minimun_with} FCFA</TableCell>
+                        <TableCell className="text-foreground">{platform.max_win} FCFA</TableCell>
+                        <TableCell className="text-muted-foreground text-sm">
+                          {platform.city && platform.street ? `${platform.city}, ${platform.street}` : "-"}
+                        </TableCell>
+                        <TableCell className="text-right">
+                          <DropdownMenu>
+                            <DropdownMenuTrigger asChild>
+                              <Button variant="ghost" size="icon">
+                                <MoreVertical className="h-4 w-4" />
+                              </Button>
+                            </DropdownMenuTrigger>
+                            <DropdownMenuContent align="end">
+                              <DropdownMenuItem onClick={() => handleEdit(platform)}>
+                                <Pencil className="mr-2 h-4 w-4" />
+                                Modifier
+                              </DropdownMenuItem>
+                              <DropdownMenuItem onClick={() => handleDelete(platform)} className="text-destructive">
+                                <Trash2 className="mr-2 h-4 w-4" />
+                                Supprimer
+                              </DropdownMenuItem>
+                            </DropdownMenuContent>
+                          </DropdownMenu>
+                        </TableCell>
+                      </TableRow>
+                    ))}
+                  </TableBody>
+                </Table>
               </div>
             </>
           ) : (

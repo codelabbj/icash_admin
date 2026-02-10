@@ -9,10 +9,16 @@ import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table"
-import { Loader2, Plus, Pencil, Search, Trash2 } from "lucide-react"
+import { Loader2, Plus, Pencil, Search, Trash2, MoreVertical } from "lucide-react"
 import { CouponDialog } from "@/components/coupon-dialog"
 import { DeleteCouponDialog } from "@/components/delete-coupon-dialog"
 import { CopyButton } from "@/components/copy-button"
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu"
 
 export default function CouponsPage() {
   const [filters, setFilters] = useState<CouponFilters>({
@@ -147,7 +153,7 @@ export default function CouponsPage() {
                       <TableHead className="font-semibold text-muted-foreground">Plateforme</TableHead>
                       <TableHead className="font-semibold text-muted-foreground">App ID</TableHead>
                       <TableHead className="font-semibold text-muted-foreground">Créé le</TableHead>
-                      <TableHead className="font-semibold text-muted-foreground">Actions</TableHead>
+                      <TableHead className="text-right font-semibold text-muted-foreground">Actions</TableHead>
                     </TableRow>
                   </TableHeader>
                   <TableBody>
@@ -172,28 +178,24 @@ export default function CouponsPage() {
                         <TableCell className="text-muted-foreground text-sm">
                           {new Date(coupon.created_at).toLocaleDateString()}
                         </TableCell>
-                        <TableCell>
-                          <div className="flex gap-2">
-                            <Button
-                              variant="outline"
-                              size="sm"
-                              onClick={() => handleEdit(coupon)}
-                              className="h-8"
-                            >
-                              <Pencil className="mr-2 h-3 w-3" />
-                              Modifier
-                            </Button>
-                            <Button
-                              variant="outline"
-                              size="sm"
-                              onClick={() => handleDelete(coupon)}
-                              disabled={deleteCoupon.isPending}
-                              className="h-8 text-destructive hover:bg-destructive/10 hover:text-destructive"
-                            >
-                              <Trash2 className="mr-2 h-3 w-3" />
-                              Supprimer
-                            </Button>
-                          </div>
+                        <TableCell className="text-right">
+                          <DropdownMenu>
+                            <DropdownMenuTrigger asChild>
+                              <Button variant="ghost" size="icon">
+                                <MoreVertical className="h-4 w-4" />
+                              </Button>
+                            </DropdownMenuTrigger>
+                            <DropdownMenuContent align="end">
+                              <DropdownMenuItem onClick={() => handleEdit(coupon)}>
+                                <Pencil className="mr-2 h-4 w-4" />
+                                Modifier
+                              </DropdownMenuItem>
+                              <DropdownMenuItem onClick={() => handleDelete(coupon)} className="text-destructive">
+                                <Trash2 className="mr-2 h-4 w-4" />
+                                Supprimer
+                              </DropdownMenuItem>
+                            </DropdownMenuContent>
+                          </DropdownMenu>
                         </TableCell>
                       </TableRow>
                     ))}
