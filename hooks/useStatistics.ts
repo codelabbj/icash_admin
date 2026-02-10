@@ -16,8 +16,10 @@ export interface DashboardStats {
   }
   total_transactions: number
   transactions_by_app: Record<string, {
-    count: number
-    total_amount: number
+    deposit: { count: number; total_amount: number }
+    withdrawal: { count: number; total_amount: number }
+    disbursements: { count: number; total_amount: number }
+    reward: { count: number; total_amount: number }
   }>
   balance_bizao: number
   deposits_bizao: {

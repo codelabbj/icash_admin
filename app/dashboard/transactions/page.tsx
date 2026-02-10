@@ -23,6 +23,7 @@ import { ChangeStatusDialog } from "@/components/change-status-dialog"
 import { ShowStatusDialog } from "@/components/show-status-dialog"
 import { ProcessTransactionDialog } from "@/components/process-transaction-dialog"
 import { UpdateTransactionStatusDialog } from "@/components/update-transaction-status-dialog"
+import { TransactionDetailsDialog } from "@/components/transaction-details-dialog"
 import { CopyButton } from "@/components/copy-button"
 
 export default function TransactionsPage() {
@@ -40,6 +41,7 @@ export default function TransactionsPage() {
   const [showStatusDialogOpen, setShowStatusDialogOpen] = useState(false)
   const [processDialogOpen, setProcessDialogOpen] = useState(false)
   const [updateStatusDialogOpen, setUpdateStatusDialogOpen] = useState(false)
+  const [detailsDialogOpen, setDetailsDialogOpen] = useState(false)
   const [selectedTransaction, setSelectedTransaction] = useState<Transaction | null>(null)
 
   const handleChangeStatus = (transaction: Transaction) => {
@@ -60,6 +62,11 @@ export default function TransactionsPage() {
   const handleUpdateStatus = (transaction: Transaction) => {
     setSelectedTransaction(transaction)
     setUpdateStatusDialogOpen(true)
+  }
+
+  const handleShowDetails = (transaction: Transaction) => {
+    setSelectedTransaction(transaction)
+    setDetailsDialogOpen(true)
   }
 
   const getStatusLabel = (status: string) => {
@@ -377,6 +384,10 @@ export default function TransactionsPage() {
                                 <RefreshCw className="mr-2 h-4 w-4" />
                                 Afficher Statut
                               </DropdownMenuItem>
+                              <DropdownMenuItem onClick={() => handleShowDetails(transaction)} className="text-primary font-bold">
+                                <Search className="mr-2 h-4 w-4" />
+                                Détails
+                              </DropdownMenuItem>
                               <DropdownMenuItem onClick={() => handleChangeStatus(transaction)}>
                                 <RefreshCw className="mr-2 h-4 w-4" />
                                 Changer Statut
@@ -456,6 +467,11 @@ export default function TransactionsPage() {
       <UpdateTransactionStatusDialog
         open={updateStatusDialogOpen}
         onOpenChange={setUpdateStatusDialogOpen}
+        transaction={selectedTransaction}
+      />
+      <TransactionDetailsDialog
+        open={detailsDialogOpen}
+        onOpenChange={setDetailsDialogOpen}
         transaction={selectedTransaction}
       />
     </div>

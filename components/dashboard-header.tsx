@@ -15,8 +15,9 @@ import { Avatar, AvatarFallback } from "@/components/ui/avatar"
 import { LogOut, User, Moon, Sun, Bug, Menu, X } from "lucide-react"
 import { useTheme } from "next-themes"
 import { useEffect, useState } from "react"
-import Image from "next/image";
+import Image from "next/image"
 import logo from "@/public/logo.png"
+import { CONFIG } from "@/lib/config"
 
 interface DashboardHeaderProps {
   onToggleSidebar?: () => void
@@ -58,10 +59,16 @@ export function DashboardHeader({ onToggleSidebar, sidebarOpen }: DashboardHeade
           )}
 
           <div className="flex items-center gap-3">
-              <Image src={logo} alt="logo" className="rounded-lg h-15 w-auto"/>
+            <Image
+              src={CONFIG.APP_LOGO_URL || logo}
+              alt="logo"
+              width={60}
+              height={60}
+              className="rounded-lg h-15 w-auto"
+            />
             <div className="hidden md:block">
               <h1 className="text-xl font-bold bg-gradient-to-r from-primary to-accent bg-clip-text text-transparent">
-                Zefast Admin
+                {CONFIG.APP_NAME}
               </h1>
               <p className="text-xs text-muted-foreground font-medium">Gérez votre plateforme</p>
             </div>
