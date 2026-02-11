@@ -30,11 +30,30 @@ export default function RootLayout({
             --primary: ${CONFIG.PRIMARY_COLOR};
             --accent: ${CONFIG.ACCENT_COLOR};
             --ring: ${CONFIG.PRIMARY_COLOR};
+            --sidebar-primary: ${CONFIG.PRIMARY_COLOR};
+            --sidebar-accent: ${CONFIG.ACCENT_COLOR};
+            --sidebar-ring: ${CONFIG.PRIMARY_COLOR};
+            --stat-card-rust: ${CONFIG.STAT_CARD_RUST};
+            --stat-card-orange: ${CONFIG.STAT_CARD_ORANGE};
+            --stat-card-dark: ${CONFIG.STAT_CARD_DARK};
+            --stat-card-amber: ${CONFIG.STAT_CARD_AMBER};
+            --stat-card-emerald: ${CONFIG.STAT_CARD_EMERALD};
+            --stat-card-purple: ${CONFIG.STAT_CARD_PURPLE};
+            --stat-card-rose: ${CONFIG.STAT_CARD_ROSE};
+            --stat-card-cyan: ${CONFIG.STAT_CARD_CYAN};
+            --chart-1: ${CONFIG.CHART_1};
+            --chart-2: ${CONFIG.CHART_2};
+            --chart-3: ${CONFIG.CHART_3};
+            --chart-4: ${CONFIG.CHART_4};
+            --chart-5: ${CONFIG.CHART_5};
           }
           .dark {
             --primary: ${CONFIG.PRIMARY_COLOR};
             --accent: ${CONFIG.ACCENT_COLOR};
             --ring: ${CONFIG.PRIMARY_COLOR};
+            --sidebar-primary: ${CONFIG.PRIMARY_COLOR};
+            --sidebar-accent: ${CONFIG.ACCENT_COLOR};
+            --sidebar-ring: ${CONFIG.PRIMARY_COLOR};
           }
         `}} />
       </head>
