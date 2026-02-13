@@ -488,7 +488,7 @@ export function SettingsDialog({ open, onOpenChange }: SettingsDialogProps) {
 
             {formData.requires_deposit_to_view_coupon && (
               <div className="space-y-2">
-                <Label htmlFor="minimun_deposit_before_view_coupon">Dépôt Minimum pour voir (FCFA)</Label>
+                <Label htmlFor="minimun_deposit_before_view_coupon">Dépôt Minimum pour voir les coupons (FCFA)</Label>
                 <Input
                   id="minimun_deposit_before_view_coupon"
                   type="number"
