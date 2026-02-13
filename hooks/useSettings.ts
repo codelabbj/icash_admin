@@ -24,6 +24,7 @@ export interface Settings {
     mtn_default_link: string | null
     moov_marchand_phone: string | null
     orange_marchand_phone: string | null
+    mtn_marchand_phone: string | null
     bf_orange_marchand_phone: string | null
     bf_moov_marchand_phone: string | null
     connect_pro_base_url: string | null
@@ -33,6 +34,7 @@ export interface Settings {
 
 export type SettingsInput = Omit<Settings, "id"> & {
     orange_marchand_phone?: string | null
+    mtn_marchand_phone?: string | null
     bf_orange_marchand_phone?: string | null
     bf_moov_marchand_phone?: string | null
 }

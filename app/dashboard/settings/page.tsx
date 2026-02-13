@@ -150,6 +150,10 @@ export default function SettingsPage() {
                 <Badge variant="outline">{settings.orange_marchand_phone || "N/A"}</Badge>
               </div>
               <div className="flex justify-between items-center">
+                <span className="text-sm text-muted-foreground">Téléphone MTN Marchand</span>
+                <Badge variant="outline">{settings.mtn_marchand_phone || "N/A"}</Badge>
+              </div>
+              <div className="flex justify-between items-center">
                 <span className="text-sm text-muted-foreground">Téléphone Orange Marchant (BF)</span>
                 <Badge variant="outline">{settings.bf_orange_marchand_phone || "N/A"}</Badge>
               </div>

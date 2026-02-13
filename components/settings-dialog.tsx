@@ -45,6 +45,7 @@ export function SettingsDialog({ open, onOpenChange }: SettingsDialogProps) {
     mtn_default_link: null,
     moov_marchand_phone: null,
     orange_marchand_phone: null,
+    mtn_marchand_phone: null,
     bf_orange_marchand_phone: null,
     bf_moov_marchand_phone: null,
     connect_pro_base_url: null,
@@ -73,6 +74,7 @@ export function SettingsDialog({ open, onOpenChange }: SettingsDialogProps) {
         mtn_default_link: settings.mtn_default_link || null,
         moov_marchand_phone: settings.moov_marchand_phone || null,
         orange_marchand_phone: settings.orange_marchand_phone || null,
+        mtn_marchand_phone: settings.mtn_marchand_phone || null,
         bf_orange_marchand_phone: settings.bf_orange_marchand_phone || null,
         bf_moov_marchand_phone: settings.bf_moov_marchand_phone || null,
         connect_pro_base_url: settings.connect_pro_base_url || null,
@@ -112,7 +114,7 @@ export function SettingsDialog({ open, onOpenChange }: SettingsDialogProps) {
     })
 
     // Phone number validation (basic)
-    const phoneFields = ['whatsapp_phone', 'moov_marchand_phone', 'orange_marchand_phone', 'bf_orange_marchand_phone', 'bf_moov_marchand_phone']
+    const phoneFields = ['whatsapp_phone', 'moov_marchand_phone', 'orange_marchand_phone', 'mtn_marchand_phone', 'bf_orange_marchand_phone', 'bf_moov_marchand_phone']
     phoneFields.forEach(phoneField => {
       const value = formData[phoneField as keyof SettingsInput] as string
       if (value && !value.match(/^\+?[0-9\s\-\(\)]+$/)) {
@@ -140,6 +142,7 @@ export function SettingsDialog({ open, onOpenChange }: SettingsDialogProps) {
       mtn_default_link: formData.mtn_default_link || null,
       moov_marchand_phone: formData.moov_marchand_phone || null,
       orange_marchand_phone: formData.orange_marchand_phone || null,
+      mtn_marchand_phone: formData.mtn_marchand_phone || null,
       bf_orange_marchand_phone: formData.bf_orange_marchand_phone || null,
       bf_moov_marchand_phone: formData.bf_moov_marchand_phone || null,
       requires_deposit_to_view_coupon: formData.requires_deposit_to_view_coupon,
@@ -421,6 +424,26 @@ export function SettingsDialog({ open, onOpenChange }: SettingsDialogProps) {
                 placeholder="+229XXXXXXXXX"
                 disabled={updateSettings.isPending}
               />
+            </div>
+
+            <div className="space-y-2">
+              <Label htmlFor="mtn_marchand_phone">Téléphone MTN Marchand</Label>
+              <Input
+                id="mtn_marchand_phone"
+                value={formData.mtn_marchand_phone || ""}
+                onChange={(e) => {
+                  setFormData({ ...formData, mtn_marchand_phone: e.target.value || null })
+                  if (validationErrors?.mtn_marchand_phone) {
+                    setValidationErrors({ ...validationErrors, mtn_marchand_phone: "" })
+                  }
+                }}
+                placeholder="+229XXXXXXXXX"
+                disabled={updateSettings.isPending}
+                className={validationErrors?.mtn_marchand_phone ? "border-destructive" : ""}
+              />
+              {validationErrors?.mtn_marchand_phone && (
+                <p className="text-xs text-destructive">{validationErrors.mtn_marchand_phone}</p>
+              )}
             </div>
 
             <div className="space-y-2">
