@@ -4,6 +4,7 @@ import type React from "react"
 
 import { useState, useEffect } from "react"
 import { useCreateNetwork, useUpdateNetwork, type Network, type NetworkInput } from "@/hooks/useNetworks"
+import { toast } from "react-hot-toast"
 import {
     Dialog,
     DialogContent,
@@ -67,6 +68,10 @@ export function NetworkDialog({ open, onOpenChange, network }: NetworkDialogProp
         active_for_deposit: true,
         active_for_with: true,
         customer_pay_fee: false,
+        payment_by_ussd_code: false,
+        ussd_code: "",
+        reduce_fee: false,
+        fee_payin: 0,
     })
 
     useEffect(() => {
@@ -89,6 +94,10 @@ export function NetworkDialog({ open, onOpenChange, network }: NetworkDialogProp
                 active_for_deposit: network.active_for_deposit,
                 active_for_with: network.active_for_with,
                 customer_pay_fee: network.customer_pay_fee,
+                payment_by_ussd_code: network.payment_by_ussd_code ?? false,
+                ussd_code: network.ussd_code ?? "",
+                reduce_fee: network.reduce_fee ?? false,
+                fee_payin: network.fee_payin ?? 0,
             })
             setSelectedImage(network.image)
         } else {
@@ -110,6 +119,10 @@ export function NetworkDialog({ open, onOpenChange, network }: NetworkDialogProp
                 active_for_deposit: true,
                 active_for_with: true,
                 customer_pay_fee: false,
+                payment_by_ussd_code: false,
+                ussd_code: "",
+                reduce_fee: false,
+                fee_payin: 0,
             })
             setSelectedImage(null)
         }
@@ -131,7 +144,7 @@ export function NetworkDialog({ open, onOpenChange, network }: NetworkDialogProp
     }
 
     const handleDialogOpenChange = (open: boolean) => {
-        if(!open) {
+        if (!open) {
             if (network) {
                 setFormData({
                     name: network.name,
@@ -151,6 +164,10 @@ export function NetworkDialog({ open, onOpenChange, network }: NetworkDialogProp
                     active_for_deposit: network.active_for_deposit,
                     active_for_with: network.active_for_with,
                     customer_pay_fee: network.customer_pay_fee,
+                    payment_by_ussd_code: network.payment_by_ussd_code ?? false,
+                    ussd_code: network.ussd_code ?? "",
+                    reduce_fee: network.reduce_fee ?? false,
+                    fee_payin: network.fee_payin ?? 0,
                 })
                 setSelectedImage(network.image)
             } else {
@@ -172,6 +189,10 @@ export function NetworkDialog({ open, onOpenChange, network }: NetworkDialogProp
                     active_for_deposit: true,
                     active_for_with: true,
                     customer_pay_fee: false,
+                    payment_by_ussd_code: false,
+                    ussd_code: "",
+                    reduce_fee: false,
+                    fee_payin: 0,
                 })
                 setSelectedImage(null)
             }
@@ -182,15 +203,26 @@ export function NetworkDialog({ open, onOpenChange, network }: NetworkDialogProp
     const handleSubmit = (e: React.FormEvent) => {
         e.preventDefault()
 
+        const dataToSubmit = { ...formData }
+
+        if (dataToSubmit.payment_by_ussd_code) {
+            if (!dataToSubmit.ussd_code.includes("{amount}")) {
+                toast.error("Le code USSD doit contenir '{amount}' pour indiquer l'emplacement de la saisie.")
+                return
+            }
+        } else {
+            dataToSubmit.ussd_code = "" // Or preserve what was there if desired, but request implies blank or excluded
+        }
+
         if (network) {
             updateNetwork.mutate(
-                { id: network.id, data: formData,file:file??undefined },
+                { id: network.id, data: dataToSubmit, file: file ?? undefined },
                 {
                     onSuccess: () => handleDialogOpenChange(false),
                 },
             )
         } else {
-            createNetwork.mutate({data:formData,file:file??undefined}, {
+            createNetwork.mutate({ data: dataToSubmit, file: file ?? undefined }, {
                 onSuccess: () => {
                     handleDialogOpenChange(false)
                 },
@@ -348,6 +380,19 @@ export function NetworkDialog({ open, onOpenChange, network }: NetworkDialogProp
                                 </SelectContent>
                             </Select>
                         </div>
+
+                        <div className="space-y-2">
+                            <Label htmlFor="fee_payin">Frais Payin (Nombre) *</Label>
+                            <Input
+                                id="fee_payin"
+                                type="number"
+                                step="any"
+                                value={formData.fee_payin}
+                                onChange={(e) => setFormData({ ...formData, fee_payin: parseFloat(e.target.value) || 0 })}
+                                required
+                                disabled={isPending}
+                            />
+                        </div>
                     </div>
 
                     <div className="space-y-2">
@@ -442,7 +487,41 @@ export function NetworkDialog({ open, onOpenChange, network }: NetworkDialogProp
                                 />
                             </div>
                         )}
+
+                        <div className="flex items-center justify-between space-x-2">
+                            <Label htmlFor="reduce_fee">Réduire les frais</Label>
+                            <Switch
+                                id="reduce_fee"
+                                checked={formData.reduce_fee}
+                                onCheckedChange={(checked) => setFormData({ ...formData, reduce_fee: checked })}
+                                disabled={isPending}
+                            />
+                        </div>
+
+                        <div className="flex items-center justify-between space-x-2">
+                            <Label htmlFor="payment_by_ussd_code">Paiement par Code USSD</Label>
+                            <Switch
+                                id="payment_by_ussd_code"
+                                checked={formData.payment_by_ussd_code}
+                                onCheckedChange={(checked) => setFormData({ ...formData, payment_by_ussd_code: checked })}
+                                disabled={isPending}
+                            />
+                        </div>
                     </div>
+
+                    {formData.payment_by_ussd_code && (
+                        <div className="space-y-2">
+                            <Label htmlFor="ussd_code">Code USSD (doit contenir {'{amount}'}) *</Label>
+                            <Input
+                                id="ussd_code"
+                                value={formData.ussd_code}
+                                onChange={(e) => setFormData({ ...formData, ussd_code: e.target.value })}
+                                placeholder="*XXX*X*{amount}#"
+                                required
+                                disabled={isPending}
+                            />
+                        </div>
+                    )}
 
                     <DialogFooter>
                         <Button type="button" variant="outline" className="hover:bg-primary/20" onClick={() => handleDialogOpenChange(false)} disabled={isPending}>
