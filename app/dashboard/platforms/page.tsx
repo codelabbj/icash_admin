@@ -143,6 +143,8 @@ export default function PlatformsPage() {
                     <TableRow className="bg-muted/50 hover:bg-muted/50 border-b border-border/50">
                       <TableHead className="font-semibold text-muted-foreground h-12">Nom</TableHead>
                       <TableHead className="font-semibold text-muted-foreground">Statut</TableHead>
+                      <TableHead className="font-semibold text-muted-foreground">Actif Dépôt</TableHead>
+                      <TableHead className="font-semibold text-muted-foreground">Actif Retrait</TableHead>
                       <TableHead className="font-semibold text-muted-foreground">Dépôt Min</TableHead>
                       <TableHead className="font-semibold text-muted-foreground">Dépôt Max</TableHead>
                       <TableHead className="font-semibold text-muted-foreground">Retrait Min</TableHead>
@@ -158,6 +160,16 @@ export default function PlatformsPage() {
                         <TableCell>
                           <Badge variant={platform.enable ? "default" : "secondary"} className="font-medium">
                             {platform.enable ? "Actif" : "Inactif"}
+                          </Badge>
+                        </TableCell>
+                        <TableCell>
+                          <Badge variant={platform.active_for_deposit ? "default" : "secondary"} className="font-medium">
+                            {platform.active_for_deposit ? "Oui" : "Non"}
+                          </Badge>
+                        </TableCell>
+                        <TableCell>
+                          <Badge variant={platform.active_for_with ? "default" : "secondary"} className="font-medium">
+                            {platform.active_for_with ? "Oui" : "Non"}
                           </Badge>
                         </TableCell>
                         <TableCell className="text-foreground">{platform.minimun_deposit} FCFA</TableCell>

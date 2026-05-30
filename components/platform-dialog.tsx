@@ -34,6 +34,8 @@ export function PlatformDialog({ open, onOpenChange, platform }: PlatformDialogP
         name: "",
         image: "",
         enable: true,
+        active_for_deposit: true,
+        active_for_with: true,
         deposit_tuto_link: null,
         withdrawal_tuto_link: null,
         why_withdrawal_fail: null,
@@ -56,6 +58,8 @@ export function PlatformDialog({ open, onOpenChange, platform }: PlatformDialogP
                 name: platform.name,
                 image: platform.image,
                 enable: platform.enable,
+                active_for_deposit: platform.active_for_deposit ?? true,
+                active_for_with: platform.active_for_with ?? true,
                 deposit_tuto_link: platform.deposit_tuto_link,
                 withdrawal_tuto_link: platform.withdrawal_tuto_link,
                 why_withdrawal_fail: platform.why_withdrawal_fail,
@@ -77,6 +81,8 @@ export function PlatformDialog({ open, onOpenChange, platform }: PlatformDialogP
                 name: "",
                 image: "",
                 enable: true,
+                active_for_deposit: true,
+                active_for_with: true,
                 deposit_tuto_link: null,
                 withdrawal_tuto_link: null,
                 why_withdrawal_fail: null,
@@ -124,6 +130,8 @@ export function PlatformDialog({ open, onOpenChange, platform }: PlatformDialogP
                             name: "",
                             image: "",
                             enable: true,
+                            active_for_deposit: true,
+                            active_for_with: true,
                             deposit_tuto_link: null,
                             withdrawal_tuto_link: null,
                             why_withdrawal_fail: null,
@@ -154,6 +162,8 @@ export function PlatformDialog({ open, onOpenChange, platform }: PlatformDialogP
                             name: "",
                             image: "",
                             enable: true,
+                            active_for_deposit: true,
+                            active_for_with: true,
                             deposit_tuto_link: null,
                             withdrawal_tuto_link: null,
                             why_withdrawal_fail: null,
@@ -360,6 +370,26 @@ export function PlatformDialog({ open, onOpenChange, platform }: PlatformDialogP
                                 id="enable"
                                 checked={formData.enable}
                                 onCheckedChange={(checked) => setFormData({ ...formData, enable: checked })}
+                                disabled={isPending}
+                            />
+                        </div>
+
+                        <div className="flex items-center justify-between space-x-2">
+                            <Label htmlFor="active_for_deposit">Actif pour Dépôt</Label>
+                            <Switch
+                                id="active_for_deposit"
+                                checked={formData.active_for_deposit}
+                                onCheckedChange={(checked) => setFormData({ ...formData, active_for_deposit: checked })}
+                                disabled={isPending}
+                            />
+                        </div>
+
+                        <div className="flex items-center justify-between space-x-2">
+                            <Label htmlFor="active_for_with">Actif pour Retrait</Label>
+                            <Switch
+                                id="active_for_with"
+                                checked={formData.active_for_with}
+                                onCheckedChange={(checked) => setFormData({ ...formData, active_for_with: checked })}
                                 disabled={isPending}
                             />
                         </div>

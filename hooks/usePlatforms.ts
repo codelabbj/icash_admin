@@ -10,6 +10,8 @@ export interface Platform {
     name: string
     image: string
     enable: boolean
+    active_for_deposit: boolean
+    active_for_with: boolean
     deposit_tuto_link: string | null
     withdrawal_tuto_link: string | null
     why_withdrawal_fail: string | null
