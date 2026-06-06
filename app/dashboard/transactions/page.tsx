@@ -442,56 +442,63 @@ export default function TransactionsPage() {
                           })}
                         </TableCell>
                         <TableCell className="text-right">
-                          <DropdownMenu>
-                            <DropdownMenuTrigger asChild>
-                              <Button variant="ghost" className="h-8 w-8 p-0">
-                                <span className="sr-only">Ouvrir le menu</span>
-                                <MoreVertical className="h-4 w-4" />
+                          <div className="flex items-center justify-end gap-2">
+                            {transaction.status !== "accept" && (transaction.type_trans === "deposit" || transaction.type_trans === "withdrawal") && (
+                              <Button
+                                variant="outline"
+                                size="sm"
+                                onClick={() => handleFinalizeTransaction(transaction)}
+                                className="text-green-600 border-green-200 hover:bg-green-50 hover:text-green-700 h-8"
+                              >
+                                <CheckCircle2 className="mr-1.5 h-4 w-4" />
+                                Créditer
                               </Button>
-                            </DropdownMenuTrigger>
-                            <DropdownMenuContent align="end" className="w-[200px]">
-                              <DropdownMenuItem onClick={() => handleShowStatus(transaction)} className="text-blue-600">
-                                <RefreshCw className="mr-2 h-4 w-4" />
-                                Afficher Statut
-                              </DropdownMenuItem>
-                              <DropdownMenuItem onClick={() => handleShowDetails(transaction)} className="text-primary font-bold">
-                                <Search className="mr-2 h-4 w-4" />
-                                Détails
-                              </DropdownMenuItem>
-                              <DropdownMenuItem onClick={() => handleChangeStatus(transaction)}>
-                                <RefreshCw className="mr-2 h-4 w-4" />
-                                Changer Statut
-                              </DropdownMenuItem>
-                              {transaction.status === "pending" || transaction.status === "error" ? (
+                            )}
+                            <DropdownMenu>
+                              <DropdownMenuTrigger asChild>
+                                <Button variant="ghost" className="h-8 w-8 p-0">
+                                  <span className="sr-only">Ouvrir le menu</span>
+                                  <MoreVertical className="h-4 w-4" />
+                                </Button>
+                              </DropdownMenuTrigger>
+                              <DropdownMenuContent align="end" className="w-[200px]">
+                                <DropdownMenuItem onClick={() => handleShowStatus(transaction)} className="text-blue-600">
+                                  <RefreshCw className="mr-2 h-4 w-4" />
+                                  Afficher Statut
+                                </DropdownMenuItem>
+                                <DropdownMenuItem onClick={() => handleShowDetails(transaction)} className="text-primary font-bold">
+                                  <Search className="mr-2 h-4 w-4" />
+                                  Détails
+                                </DropdownMenuItem>
+                                <DropdownMenuItem onClick={() => handleChangeStatus(transaction)}>
+                                  <RefreshCw className="mr-2 h-4 w-4" />
+                                  Changer Statut
+                                </DropdownMenuItem>
+                                {transaction.status === "pending" || transaction.status === "error" ? (
+                                  <DropdownMenuItem
+                                    onClick={() => handleProcessTransaction(transaction)}
+                                    className="text-green-600"
+                                  >
+                                    <RefreshCw className="mr-2 h-4 w-4" />
+                                    Traiter
+                                  </DropdownMenuItem>
+                                ) : null}
+                                <DropdownMenuSeparator />
+                                <DropdownMenuItem onClick={() => handleRewardUser(transaction)} className="text-amber-600 font-medium">
+                                  <Gift className="mr-2 h-4 w-4" />
+                                  Récompenser
+                                </DropdownMenuItem>
+                                <DropdownMenuSeparator />
                                 <DropdownMenuItem
-                                  onClick={() => handleProcessTransaction(transaction)}
-                                  className="text-green-600"
+                                  onClick={() => handleUpdateStatus(transaction)}
+                                  className="text-purple-600"
                                 >
                                   <RefreshCw className="mr-2 h-4 w-4" />
-                                  Traiter
+                                  Changement manuel
                                 </DropdownMenuItem>
-                              ) : null}
-                              <DropdownMenuSeparator />
-                              {transaction.status !== "accept" && (transaction.type_trans === "deposit" || transaction.type_trans === "withdrawal") && (
-                                <DropdownMenuItem onClick={() => handleFinalizeTransaction(transaction)} className="text-green-600 font-medium">
-                                  <CheckCircle2 className="mr-2 h-4 w-4" />
-                                  CRÉDITER L'UTILISATEUR
-                                </DropdownMenuItem>
-                              )}
-                              <DropdownMenuItem onClick={() => handleRewardUser(transaction)} className="text-amber-600 font-medium">
-                                <Gift className="mr-2 h-4 w-4" />
-                                Récompenser
-                              </DropdownMenuItem>
-                              <DropdownMenuSeparator />
-                              <DropdownMenuItem
-                                onClick={() => handleUpdateStatus(transaction)}
-                                className="text-purple-600"
-                              >
-                                <RefreshCw className="mr-2 h-4 w-4" />
-                                Changement manuel
-                              </DropdownMenuItem>
-                            </DropdownMenuContent>
-                          </DropdownMenu>
+                              </DropdownMenuContent>
+                            </DropdownMenu>
+                          </div>
                         </TableCell>
                       </TableRow>
                     ))}
